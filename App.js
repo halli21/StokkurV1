@@ -6,6 +6,8 @@ import SkitakallSetUp from './src/views/SkitakallSetUp';
 import Table from './src/views/Table';
 import PlayerHand from './src/views/PlayerHand';
 
+import OpponentHand from './src/views/OpponentHand';
+
 
 
 const { width, height } = Dimensions.get('window');
@@ -28,21 +30,21 @@ export default function App() {
                 <SkitakallSetUp></SkitakallSetUp>
             </View>
 
-            <View style={{ flex: 1, backgroundColor: 'yellow'}}>
-                <PlayerHand></PlayerHand>
+            <View style={{ flex: 1, backgroundColor: 'yellow', justifyContent: 'center'}}>
+                <OpponentHand></OpponentHand>
             </View> 
             
 
-            <View style={{ flex: 1.5, backgroundColor: 'red', justifyContent: 'center' }}>
+            <View style={{ flex: 1.4, backgroundColor: 'red', justifyContent: 'center' }}>
                 <Table></Table>
             </View> 
 
             
-            <View style={{ flex: 1.2, backgroundColor: 'yellow', justifyContent: 'center'}}>
+            <View style={{ flex: 1, backgroundColor: 'yellow', justifyContent: 'center'}}>
                 <PlayerHand></PlayerHand>
             </View>
 
-            <View style={{ flex: 1.2, backgroundColor: 'blue', justifyContent: 'center'}}>
+            <View style={{ flex: 1, backgroundColor: 'blue', justifyContent: 'center'}}>
                 <SkitakallSetUp></SkitakallSetUp>
             </View>
 

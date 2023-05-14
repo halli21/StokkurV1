@@ -10,16 +10,10 @@ const em = rem * pixelRatio;
 
 export default StyleSheet.create({
 
-    handContainer: {
-        //paddingTop: 1 * rem,
-        backgroundColor: 'green'
-
-    },
-    smallHand: {
+    opponentHand: {
         flexDirection: 'row',
         justifyContent: 'space-evenly',
+
+        //backgroundColor: 'brown'
     },
-    cardContainer: {
-        marginHorizontal: 0.3 * rem,
-    }
 });

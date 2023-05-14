@@ -2,7 +2,9 @@
 import { View, Text } from 'react-native';
 import styles from "./styles";
 
-import Card from '../../components/Card/card';
+
+import Card from '../../components/Card';
+
 
 import { deckOfCards } from '../../utils/deckOfCards.js';
 

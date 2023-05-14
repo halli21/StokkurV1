@@ -24,14 +24,24 @@ export default StyleSheet.create({
         
     },
     visible: {
-       
         zIndex: 2,
         position: 'absolute',
         flexDirection: 'row',
-        justifyContent: 'space-evenly',
+        //backgroundColor: 'green'
         
     },
-    card: {
-        
+    firstCard: {
+        marginLeft: width * 0.08,
+        marginTop: height * 0.01
+    },
+    secondCard: {
+        position: 'absolute',
+        marginLeft: width * 0.38,
+        marginTop: height * 0.01
+    },
+    thirdCard: {
+        position: 'absolute',
+        marginLeft: width * 0.68,
+        marginTop: height * 0.01
     },
 });
