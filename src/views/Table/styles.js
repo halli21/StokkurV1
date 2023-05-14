@@ -25,5 +25,11 @@ export default StyleSheet.create({
         textAlign: 'center',
         fontSize: 15
     },
+    photo: {
+        resizeMode: 'contain',
+        width: 0.2 * width,
+        height: 0.3 * width,
+        borderRadius: 5,
+    }
 
 });

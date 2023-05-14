@@ -10,36 +10,7 @@ import { deckOfCards } from '../../utils/deckOfCards.js';
 
 
 
-const SkitakallSetUp = () => {
-
-    const randomIndex = Math.floor(Math.random() * deckOfCards.length);
-    const randomCard = deckOfCards[randomIndex];
-    const randomIndex2 = Math.floor(Math.random() * deckOfCards.length);
-    const randomCard2 = deckOfCards[randomIndex2];
-    const randomIndex3 = Math.floor(Math.random() * deckOfCards.length);
-    const randomCard3 = deckOfCards[randomIndex3];
-
-
-    const underIndex = Math.floor(Math.random() * deckOfCards.length);
-    const underCard = deckOfCards[underIndex];
-    const underIndex2 = Math.floor(Math.random() * deckOfCards.length);
-    const underCard2 = deckOfCards[underIndex2];
-    const underIndex3 = Math.floor(Math.random() * deckOfCards.length);
-    const underCard3 = deckOfCards[underIndex3];
-
-
-    const hiddenCards = [
-        { id: underCard.id, rank: randomCard.rank, suit: randomCard.suit, selected: randomCard.selected },
-        { id: underCard2.id, rank: randomCard.rank, suit: randomCard.suit, selected: randomCard.selected },
-        { id: underCard3.id, rank: randomCard.rank, suit: randomCard.suit, selected: randomCard.selected },
-    ];
-    
-    const visibleCards = [
-        { id: randomCard.id, rank: randomCard.rank, suit: randomCard.suit, selected: randomCard.selected },
-        { id: randomCard2.id, rank: randomCard.rank, suit: randomCard.suit, selected: randomCard.selected },
-        { id: randomCard3.id, rank: randomCard.rank, suit: randomCard.suit, selected: randomCard.selected },
-    ];
-
+const SkitakallSetUp = ({visibleCards, hiddenCards}) => {
 
 
     return (
