@@ -71,7 +71,7 @@ const SkitakallGame = () => {
         setOpponentVisibleCards(opponentVisibleCards);
         setOpponentHiddenCards(opponentHiddenCards);
 
-        setDrawCardsPile(drawCardsPile)
+        setDrawCardsPile([])
         setPlayedCardsPile(playedCardsPile)
 
         setTurn('Player 1')
@@ -151,27 +151,6 @@ const SkitakallGame = () => {
         }
         return true;
     }
-
-
-
-    const onDeckPickup = () => {
-        
-
-        // If the deck needs to be picked up because of a failed placement then also add it to hand
-        /*
-        if (failed) {
-            newHand = [...hand, ...playedCardsPile, failed];
-        }
-        else {
-            newHand = [...hand, ...playedCardsPile];
-        }
-        */
-        newHand = [...myHand, ...playedCardsPile];
-    
-        setMyHand(newHand);
-        setPlayedCardsPile([])
-    }
-
 
 
 
@@ -272,6 +251,7 @@ const SkitakallGame = () => {
         }
         */
     }
+
 
 
     const handleSelected = (played_card) => {
@@ -389,6 +369,68 @@ const SkitakallGame = () => {
     }
 
 
+    const onDrawnCardPlayed = () => {
+        const played_card = drawCardsPile.splice(0, 1);    
+        const valid = onCardPlayedHandler(played_card[0]);
+        if (!valid) {
+            onDeckPickup(played_card[0]);
+        }
+    }
+
+
+    const onDeckPickup = (failed=null) => {
+        // If the deck needs to be picked up because of a failed placement then also add it to hand
+        if (failed) {
+            newHand = [...myHand, ...playedCardsPile, failed];
+        }
+        else {
+            newHand = [...myHand, ...playedCardsPile];
+        }
+        
+        setMyHand(newHand);
+        setPlayedCardsPile([])
+    }
+
+
+    const onTableCardPlayed = (played_card) => {
+    
+        if (myHand.length !== 0 || drawCardsPile.length !== 0) {
+            return;
+        }
+
+        const valid = onCardPlayedHandler(played_card); 
+        const cardIndex = myVisibleCards.indexOf(played_card);
+        myVisibleCards[cardIndex] = null;    
+
+        if (!valid) {
+            onDeckPickup(played_card);
+        }
+
+        setMyVisibleCards(myVisibleCards)
+    }
+
+
+    const onHiddenCardPlayed = (played_card) => {
+        
+        if (myHand.length !== 0 || drawCardsPile.length !== 0 || myVisibleCards[0] !== null || myVisibleCards[1] !== null || myVisibleCards[2] !== null) {
+            return;
+        }
+
+        const valid = onCardPlayedHandler(played_card);
+        const cardIndex = myHiddenCards.indexOf(played_card);
+        myHiddenCards.splice(cardIndex, 1); 
+
+        if (!valid) {
+            onDeckPickup(played_card);
+        }
+
+        setMyHiddenCards(myHiddenCards)
+    }
+
+
+
+
+
 
     return (
         <View style={styles.container}>
@@ -398,7 +440,9 @@ const SkitakallGame = () => {
                 <SkitakallSetUp 
                     visibleCards={opponentVisibleCards} 
                     hiddenCards={opponentHiddenCards} 
-                    playedHandler={() => console.log("Do nothing")}
+                    visibleHandler={() => console.log("Do nothing, not your card")}
+                    hiddenHandler={() => console.log("Do nothing, not your card")}
+
                 />
             </View>
 
@@ -413,6 +457,7 @@ const SkitakallGame = () => {
                 <Table 
                     drawCardsPile={drawCardsPile} 
                     playedCardsPile={playedCardsPile} 
+                    drawHandler={onDrawnCardPlayed}
                     pickUpHandler={onDeckPickup}
                 />
             </View> 
@@ -430,7 +475,9 @@ const SkitakallGame = () => {
                 <SkitakallSetUp 
                     visibleCards={myVisibleCards} 
                     hiddenCards={myHiddenCards} 
-                    playedHandler={onCardPlayedHandler}
+                    visibleHandler={onTableCardPlayed}
+                    hiddenHandler={onHiddenCardPlayed}
+                    selectCard={onCardSelectedHandler}
                 />
             </View>
 

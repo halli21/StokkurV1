@@ -5,7 +5,7 @@ import styles from "./styles";
 import Card from '../../components/Card';
 import blank from '../../resources/blank.png';
 
-const Table = ({drawCardsPile, playedCardsPile, pickUpHandler}) => {
+const Table = ({drawCardsPile, playedCardsPile, drawHandler, pickUpHandler}) => {
 
     const drawIsEmpty = drawCardsPile.length === 0;
     const playedIsEmpty = playedCardsPile.length === 0;
@@ -25,7 +25,8 @@ const Table = ({drawCardsPile, playedCardsPile, pickUpHandler}) => {
                         suit={drawCardsPile[0].suit} 
                         selected={drawCardsPile[0].selected} 
                         hidden={true} 
-                        onLongPress={() => console.log('selected')}
+                        onClick={() => drawHandler()}
+                        onLongPress={() => console.log('deck')}
                     />    
                 ) : (  
                     <View style={styles.outline}>
@@ -52,7 +53,7 @@ const Table = ({drawCardsPile, playedCardsPile, pickUpHandler}) => {
                         selected={playedCardsPile[size - 1].selected} 
                         hidden={false}
                         onClick={() => pickUpHandler()}
-                        onLongPress={() => console.log('deck')}
+                        onLongPress={() => console.log('played')}
                     />  
                 ) : (
                     <View style={styles.outline}>
