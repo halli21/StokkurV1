@@ -23,7 +23,8 @@ export default StyleSheet.create({
     },
     number: {
         textAlign: 'center',
-        fontSize: 15
+        fontSize: 15,
+        marginBottom: 5,
     },
     photo: {
         resizeMode: 'contain',

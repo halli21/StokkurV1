@@ -12,12 +12,17 @@ export default StyleSheet.create({
 
     handContainer: {
         //paddingTop: 1 * rem,
-        backgroundColor: 'green'
+        //backgroundColor: 'green'
 
     },
     smallHand: {
         flexDirection: 'row',
         justifyContent: 'space-evenly',
+    },
+    largeHand: {
+        marginTop: -1 * rem,
+        paddingTop: 1 * rem,
+
     },
     cardContainer: {
         marginHorizontal: 0.3 * rem,

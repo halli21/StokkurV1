@@ -71,15 +71,19 @@ const cards_images = {
 };
 
 
-const Card = ({ id, rank, suit, selected, hidden, onLongPress }) => {
+const Card = ({ id, rank, suit, selected, hidden, onClick, onLongPress, onLongPressHandler}) => {
 
     const [isSelected, setIsSelected] = useState(selected);
     const [isHidden, setIsHidden] = useState(hidden);
 
     const handleLongPress = () => {
+      
         if (!isHidden) {
-            setIsSelected(!isSelected);
-            onLongPress && onLongPress(!isSelected);
+            const changed = onLongPressHandler.selectCard(onLongPressHandler.card);
+            if (changed) {
+                setIsSelected(!isSelected);
+                onLongPress && onLongPress(!isSelected);
+            }
         }
     }
     
@@ -92,7 +96,7 @@ const Card = ({ id, rank, suit, selected, hidden, onLongPress }) => {
     }
 
     return (
-        <TouchableOpacity onLongPress={handleLongPress}>
+        <TouchableOpacity onPress={onClick} onLongPress={handleLongPress}>
             <View style={ [styles.cardContainer, isSelected && styles.selectedCard] }>
                 <Image source={imageSource} style={ isHidden ? styles.hiddenCard : styles.card } />
             </View>

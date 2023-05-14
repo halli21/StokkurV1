@@ -6,9 +6,7 @@ import Card from '../../components/Card';
 
 
 
-
-
-const PlayerHand = ({hand}) => {
+const PlayerHand = ({hand, playedHandler, selectCard}) => {
 
     const isLargeHand = hand.length > 4;
 
@@ -24,7 +22,9 @@ const PlayerHand = ({hand}) => {
                                 suit={card.suit}
                                 selected={card.selected}
                                 hidden={false}
-                                onLongPress={() => console.log('selected')}
+                                onClick={() => playedHandler(card)}
+                                onLongPress={() => console.log("PlayerHand")}
+                                onLongPressHandler={{selectCard : selectCard, card : card}}
                             />
                         </View>
                     ))}
@@ -39,7 +39,9 @@ const PlayerHand = ({hand}) => {
                                 suit={card.suit}
                                 selected={card.selected}
                                 hidden={false}
-                                onLongPress={() => console.log('selected')}
+                                onClick={() => playedHandler(card)}
+                                onLongPress={() => console.log("PlayerHand")}
+                                onLongPressHandler={{selectCard : selectCard, card : card}}
                             />
                         </View>
                     ))}

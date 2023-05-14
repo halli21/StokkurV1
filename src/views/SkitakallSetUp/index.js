@@ -4,20 +4,15 @@ import styles from "./styles";
 
 import Card from '../../components/Card';
 
-import { deckOfCards } from '../../utils/deckOfCards.js';
 
-
-
-
-
-const SkitakallSetUp = ({visibleCards, hiddenCards}) => {
-
+const SkitakallSetUp = ({visibleCards, hiddenCards, playedHandler}) => {
 
     return (
         <View style={styles.tableCardsContainer}>
             <View style={styles.hidden}>
-                {hiddenCards.map((card) => (
+                {hiddenCards.map((card, y) => (
                     <Card
+                        key={y}
                         id={card.id}
                         rank={card.rank}
                         suit={card.suit}
@@ -37,7 +32,7 @@ const SkitakallSetUp = ({visibleCards, hiddenCards}) => {
                             suit={visibleCards[0].suit}
                             selected={visibleCards[0].selected}
                             hidden={false}
-                            onSelect={() => console.log('clicked')}
+                            onClick={() => playedHandler(visibleCards[0])}
                         />
                     )}
                 </View>
@@ -50,7 +45,7 @@ const SkitakallSetUp = ({visibleCards, hiddenCards}) => {
                             suit={visibleCards[1].suit}
                             selected={visibleCards[1].selected}
                             hidden={false}
-                            onSelect={() => console.log('clicked')}
+                            onClick={() => playedHandler(visibleCards[1])}
                         />
                     )}
                 </View>
@@ -63,14 +58,12 @@ const SkitakallSetUp = ({visibleCards, hiddenCards}) => {
                             suit={visibleCards[2].suit}
                             selected={visibleCards[2].selected}
                             hidden={false}
-                            onSelect={() => console.log('clicked')}
+                            onClick={() => playedHandler(visibleCards[2])}
                         />
                     )}
                 </View>
                 
             </View>
-
-    
         </View>
       );
     };
