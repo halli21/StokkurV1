@@ -48,7 +48,7 @@ export default StyleSheet.create({
     },
     psText: {
         position: 'absolute',
-        bottom: 25,
+        bottom: 100,
         opacity: 0.5
     }
 });
