@@ -1,9 +1,13 @@
+//import io from "socket.io-client";
+//const socket = io.connect("http://localhost:3001");
 
 import { View } from 'react-native';
 
-import SkitakallGame from './src/components/SkitakallGame';
+import GameMenu from './src/views/GameMenu';
 
-import SkitakallMenu from './src/views/SkitakallMenu';
+
+
+
 
 
 
@@ -11,8 +15,7 @@ export default function App() {
 
     return (
         <View>
-            <SkitakallGame></SkitakallGame>
-            <SkitakallMenu></SkitakallMenu>
+            <GameMenu></GameMenu>
         </View>
     );
 }
