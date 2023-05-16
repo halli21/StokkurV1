@@ -7,21 +7,15 @@ import GameSession from "../GameSession";
 
 import SkitakallGame from "../../components/SkitakallGame";
 
-import createNewGame from "../../utils/generateSkitakall";
-
-
 
 const GameMenu = ({socket}) => {
 
     const [room, setRoom] = useState('');
-    const [gameInstance, setGameInstance] = useState(null);
-    const [numPlayers, setNumPlayers] = useState(0);
-
+    const [joinedRoom, setJoinedRoom] = useState(false);
 
     useEffect(() => {
-        socket.on("roomFull", (data) => {
-            setNumPlayers(data.size);
-            setGameInstance(data.game);
+        socket.on("validJoin", () => {
+            setJoinedRoom(true);
         });
     
     }, []);
@@ -29,15 +23,14 @@ const GameMenu = ({socket}) => {
 
     const createRoom = () => {
         const gameCode = createCode();
-        const gameInstance = createNewGame();
         setRoom(gameCode)
-        setGameInstance(gameInstance);
-        socket.emit("create_room", {room: gameCode, game: gameInstance});
+        setJoinedRoom(true);
+        socket.emit("create_room", gameCode);
     };
 
     const closeCreate = () => {
         setRoom('');
-        setGameInstance(null);
+        setJoinedRoom(false);
     };
 
     const joinGame = () => {
@@ -51,7 +44,7 @@ const GameMenu = ({socket}) => {
     return (
         <View style={styles.container}>
 
-            {!gameInstance ? (
+            {!joinedRoom ? (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'}}>
                     <View style={styles.createButton}>
                         <TouchableOpacity onPress={createRoom}>
@@ -72,11 +65,8 @@ const GameMenu = ({socket}) => {
                 </View>
 
             ) : (
-                <GameSession socket={socket} Game={SkitakallGame} gameCode={room} numPlayers={numPlayers} closeCreate={closeCreate}/>
+                <GameSession socket={socket} Game={SkitakallGame} gameCode={room} closeCreate={closeCreate}/>
             )}  
-
-  
-
         </View>
     );
 }

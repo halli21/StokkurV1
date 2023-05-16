@@ -14,7 +14,7 @@ const io = new Server(server, {
     },
 });
 
-const games = new Map();
+
 
 
 io.on("connection", (socket) => {
@@ -23,10 +23,9 @@ io.on("connection", (socket) => {
     socket.on("create_room", (data) => {
         console.log(`Room created by ${socket.id}`)
 
-        socket.join(data.room);
-        games.set(data.room, data.game);
+        socket.join(data);
         
-        const size = io.sockets.adapter.rooms.get(data.room).size;
+        const size = io.sockets.adapter.rooms.get(data).size;
         io.to(socket.id).emit("getUserInfo", size);
     });
 
@@ -36,21 +35,31 @@ io.on("connection", (socket) => {
 
         if (roomExists) {
             socket.join(data);
+
+            io.to(socket.id).emit("validJoin");
             
             const size = io.sockets.adapter.rooms.get(data).size;
             io.to(socket.id).emit("getUserInfo", size);
 
-
             if (size >= 2) {
                 console.log(`Room full, size is ${size}`)
 
-                let game = games.get(data);
-                io.to(data).emit("roomFull", {room : data, size : size, game : game});
+                io.to(data).emit("roomFull", size);
             }
         }
         else {
             console.log("No room exists")
         }
+    });
+
+    socket.on("initGame", (data) => {
+        console.log(data)
+        io.to(data.room).emit("initGameState", {turn: data.turn, player1HiddenCards: data.player1HiddenCards, player1VisibleCards: data.player1VisibleCards, player1Hand: data.player1Hand, player2HiddenCards: data.player2HiddenCards, player2VisibleCards: data.player2VisibleCards, player2Hand: data.player2Hand, drawCardsPile: data.drawCardsPile});
+    });
+
+
+    socket.on("updateGame", (data) => {
+        io.to(data.room).emit("updateGameState", {gameOver: data.gameOver, winner: data.winner, turn: data.turn, player1HiddenCards: data.player1HiddenCards, player1VisibleCards: data.player1VisibleCards, player1Hand: data.player1Hand, player2HiddenCards: data.player2HiddenCards, player2VisibleCards: data.player2VisibleCards, player2Hand: data.player2Hand, drawCardsPile: data.drawCardsPile, playedCardsPile: data.playedCardsPile});
     });
 
 

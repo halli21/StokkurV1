@@ -6,8 +6,6 @@ import { View } from 'react-native';
 import GameMenu from './src/views/GameMenu';
 
 
-
-
 export default function App() {
 
     return (

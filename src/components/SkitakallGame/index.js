@@ -1,20 +1,11 @@
 import React, { useState, useEffect } from 'react';
-
 import { View } from 'react-native';
 
-import styles from "./styles";
 
 const _ = require('lodash');
 
-import { deckOfCards } from '../../utils/deckOfCards.js';
-import shuffleArray from '../../utils/shuffleArray';
-
-import SkitakallSetUp from '../../views/SkitakallSetUp';
-import Table from '../../views/Table';
-import PlayerHand from '../../views/PlayerHand';
-import OpponentHand from '../../views/OpponentHand';
-
-
+import createNewGame from "../../utils/generateSkitakall";
+import SkitakallView from '../../views/SkitakallView';
 
 const suitValues = {
     'C': { value: 1 },
@@ -24,23 +15,21 @@ const suitValues = {
 };
 
 
+const SkitakallGame = ({socket, room, user, numPlayers}) => {
 
-const SkitakallGame = () => {
-
-    const [currentUser, setCurrentUser] = useState('')
     const [setting, setSetting] = useState(false);
 
     const [gameOver, setGameOver] = useState(false)
     const [winner, setWinner] = useState('')
     const [turn, setTurn] = useState('')
 
-    const [myHand, setMyHand] = useState([]);
-    const [myVisibleCards, setMyVisibleCards] = useState([null, null, null]);
-    const [myHiddenCards, setMyHiddenCards] = useState([]);
+    const [player1HiddenCards, setPlayer1HiddenCards] = useState([]);
+    const [player1VisibleCards, setPlayer1VisibleCards] = useState([null, null, null]);
+    const [player1Hand, setPlayer1Hand] = useState([]);
 
-    const [opponentHand, setOpponentHand] = useState([]);
-    const [opponentVisibleCards, setOpponentVisibleCards] = useState([null, null, null]);
-    const [opponentHiddenCards, setOpponentHiddenCards] = useState([]);
+    const [player2HiddenCards, setPlayer2HiddenCards] = useState([]);
+    const [player2VisibleCards, setPlayer2VisibleCards] = useState([null, null, null]);
+    const [player2Hand, setPlayer2Hand] = useState([]);
 
     const [drawCardsPile, setDrawCardsPile] = useState([]);
     const [playedCardsPile, setPlayedCardsPile] = useState([]);
@@ -49,35 +38,115 @@ const SkitakallGame = () => {
 
 
     useEffect(() => {
-        const copyCards = _.cloneDeep(deckOfCards);
-        const shuffledCards = shuffleArray(copyCards);
+        // Only one player needs to initalize game
+        if (user === 'Player 1') {
+        
+            const initGame = createNewGame();
 
-        const myHiddenCards = shuffledCards.splice(0, 3);
-        const myVisibleCards = shuffledCards.splice(0, 3);
-        const myHand = shuffledCards.splice(0, 3);
+            socket.emit("initGame", {
+                room: room,
+                turn: initGame.turn,
+            
+                player1HiddenCards: initGame.player1HiddenCards,
+                player1VisibleCards: initGame.player1VisibleCards,
+                player1Hand: initGame.player1Hand,
 
-        const opponentHiddenCards = shuffledCards.splice(0, 3);
-        const opponentVisibleCards = shuffledCards.splice(0, 3);
-        const opponentHand = shuffledCards.splice(0, 3);
+                player2HiddenCards: initGame.player2HiddenCards,
+                player2VisibleCards: initGame.player2VisibleCards,
+                player2Hand: initGame.player2Hand,
 
-        const drawCardsPile = shuffledCards;
+                drawCardsPile: initGame.drawCardsPile,
+            })
+        }
+    }, [])
 
 
-        setMyHand(sortCards(myHand));
-        setMyVisibleCards(myVisibleCards);
-        setMyHiddenCards(myHiddenCards);
 
-        setOpponentHand(opponentHand);
-        setOpponentVisibleCards(opponentVisibleCards);
-        setOpponentHiddenCards(opponentHiddenCards);
+    useEffect(() => {
+        socket.on("initGameState", (data) => {
 
-        setDrawCardsPile([])
-        setPlayedCardsPile(playedCardsPile)
+            const sortedPlayer1 = sortCards(data.player1Hand);
+            const sortedPlayer2 = sortCards(data.player2Hand);
 
-        setTurn('Player 1')
+            setSelectedCardList([]);
+            setTurn(data.turn)
 
+            setPlayer1HiddenCards(data.player1HiddenCards)
+            setPlayer1VisibleCards(data.player1VisibleCards)
+            setPlayer1Hand(sortedPlayer1)
+
+            setPlayer2HiddenCards(data.player2HiddenCards)
+            setPlayer2VisibleCards(data.player2VisibleCards)
+            setPlayer2Hand(sortedPlayer2)
+            
+            setPlayedCardsPile([])
+            setDrawCardsPile(data.drawCardsPile)
+        })
+
+
+        socket.on("updateGameState", (data) => {
+
+            const sortedPlayer1 = sortCards(data.player1Hand);
+            const sortedPlayer2 = sortCards(data.player2Hand);
+
+            setSelectedCardList([]);
+
+            setGameOver(data.gameOver)
+            setWinner(data.winner)
+            setTurn(data.turn)
+      
+            setPlayer1HiddenCards(data.player1HiddenCards)
+            setPlayer1VisibleCards(data.player1VisibleCards)
+            setPlayer1Hand(sortedPlayer1)
+
+            setPlayer2HiddenCards(data.player2HiddenCards)
+            setPlayer2VisibleCards(data.player2VisibleCards)
+            setPlayer2Hand(sortedPlayer2)
+            
+            setPlayedCardsPile(data.playedCardsPile)
+            setDrawCardsPile(data.drawCardsPile)
+        })
          
     }, [])
+
+
+    const update = (params) => {
+        const {
+            updateRoom = room,
+            updateGameOver = gameOver,
+            updateWinner = winner,
+            updateTurn = turn,
+            updatePlayer1HiddenCards = player1HiddenCards,
+            updatePlayer1VisibleCards = player1VisibleCards,
+            updatePlayer1Hand = player1Hand,
+            updatePlayer2HiddenCards = player2HiddenCards,
+            updatePlayer2VisibleCards = player2VisibleCards,
+            updatePlayer2Hand = player2Hand,
+            updatePlayedCardsPile = playedCardsPile,
+            updateDrawCardsPile = drawCardsPile,
+        } = params;
+      
+        //const results = checkWinner(updatePlayer1Hand, updatePlayer2Hand);
+      
+        socket.emit("updateGame", {
+            room: room,
+            gameOver: false,
+            winner: '',
+            turn: updateTurn,
+        
+            player1HiddenCards: [...updatePlayer1HiddenCards],
+            player1VisibleCards: [...updatePlayer1VisibleCards],
+            player1Hand: [...updatePlayer1Hand],
+        
+            player2HiddenCards: [...updatePlayer2HiddenCards],
+            player2VisibleCards: [...updatePlayer2VisibleCards],
+            player2Hand: [...updatePlayer2Hand],
+        
+            playedCardsPile: [...updatePlayedCardsPile],
+            drawCardsPile: [...updateDrawCardsPile],
+        });
+      };
+
 
 
     const sortCards = (cards) => {
@@ -153,107 +222,6 @@ const SkitakallGame = () => {
     }
 
 
-
-    const handleBomb = (played_card) => {
-        const newHand = [...myHand];
-        let playedMany;
-
-        if (selectedCardList.length > 1) {
-            playedMany = handleSelected(played_card);
-        }
-    
-        if (playedMany !== undefined) {
-            for (let i = 0; i < playedMany.length; i++) {
-                const cardIndex = newHand.indexOf(playedMany[i]);
-                newHand.splice(cardIndex, 1);
-            }
-        }
-        
-        const cardIndex = newHand.indexOf(played_card);
-      
-        if (newHand.length <= 3 && drawCardsPile.length !== 0) {
-            const newCard = drawCardsPile.splice(0, 1);
-            newHand[cardIndex] = newCard[0];
-
-            while (newHand.length < 3 && drawCardsPile.length !== 0) {
-                const newCard = drawCardsPile.splice(0, 1);
-                newHand.push(newCard[0]);
-            }
-        }
-        else {
-            newHand.splice(cardIndex, 1)
-        }
-
-        setMyHand(sortCards(newHand));
-        setPlayedCardsPile([])    
-    }
-
-
-
-    const handleValidPlacement = (played_card) => {
-        const newHand = [...myHand];
-        let newPlayedCardsPile;
-        let playedMany;
-
-        if (selectedCardList.length > 1) {
-            playedMany = handleSelected(played_card);
-        }
-    
-        if (playedMany !== undefined) {
-            for (let i = 0; i < playedMany.length; i++) {
-                const cardIndex = newHand.indexOf(playedMany[i]);
-                newHand.splice(cardIndex, 1);
-            }
-            newPlayedCardsPile = [...playedCardsPile, ...playedMany, played_card]
-        }
-        else {
-            newPlayedCardsPile = [...playedCardsPile, played_card]
-        }
-        
-        const cardIndex = newHand.indexOf(played_card);
-        
-        if (newHand.length <= 3 && drawCardsPile.length !== 0) {
-
-            const newCard = drawCardsPile.splice(0, 1);
-            newHand[cardIndex] = newCard[0];
-
-            while (newHand.length < 3 && drawCardsPile.length !== 0) {
-                const newCard = drawCardsPile.splice(0, 1);
-                newHand.push(newCard[0]);
-            }
-        }
-        else {
-            newHand.splice(cardIndex, 1)
-        }
-
-        setMyHand(sortCards(newHand));
-        setPlayedCardsPile(newPlayedCardsPile)
-      
-
-
-        /*
-        if (!hiddenCard){
-            if (cardPlayedBy == 'Player 1') {
-                update({ updateTurn: 'Player 2', updatePlayer1Hand: newHand, updateCurrentCard: card, updatePlayedCardsPile: newPlayedCardsPile });
-            }
-            else if (cardPlayedBy == 'Player 2') {
-                update({ updateTurn: 'Player 1', updatePlayer2Hand: newHand, updateCurrentCard: card, updatePlayedCardsPile: newPlayedCardsPile });
-            }
-        }
-        else {
-            if (cardPlayedBy == 'Player 1') {
-                update({ updateTurn: 'Player 2', updateCurrentCard: card, updatePlayedCardsPile: newPlayedCardsPile });
-                
-            }
-            else if (cardPlayedBy == 'Player 2') {
-                update({ updateTurn: 'Player 1', updateCurrentCard: card, updatePlayedCardsPile: newPlayedCardsPile });
-            }
-        }
-        */
-    }
-
-
-
     const handleSelected = (played_card) => {
         let playedCards = [];
         for (let i = 0; i < selectedCardList.length; i++) {
@@ -264,6 +232,39 @@ const SkitakallGame = () => {
         setSelectedCardList([]);
         return playedCards;
     }
+
+
+    const removeCardsFromHand = (played_card, myHand) => {
+        const newHand = [...myHand];
+
+        let playedMany = handleSelected(played_card);
+        
+        for (let i = 0; i < playedMany.length; i++) {
+            const cardIndex = newHand.indexOf(playedMany[i]);
+            newHand.splice(cardIndex, 1);
+        }
+
+        const cardIndex = newHand.indexOf(played_card);
+        
+        const removed = newHand.splice(cardIndex, 1);
+
+        return newHand;
+    }
+
+
+    const fillHand = (myHand) => {
+        const newHand = [...myHand];
+
+        while (newHand.length < 3 && drawCardsPile.length !== 0) {
+            const newCard = drawCardsPile.splice(0, 1);
+            newHand.push(newCard[0]);
+        }
+
+        return newHand;
+    }
+
+
+
 
 
 
@@ -287,6 +288,15 @@ const SkitakallGame = () => {
 
 
     const onCardSelectedHandler = (card) => {
+        let myHand;
+       
+        if (user === 'Player 1') {
+            myHand = player1Hand;
+        } 
+        else if (user === 'Player 2') {
+            myHand = player2Hand;
+        }
+
         const validSelection = sameRank(card);
 
         let inSelectedCardList = false;
@@ -345,12 +355,10 @@ const SkitakallGame = () => {
             const placingStack = (selectedCardList.length === 4);
 
             if (card.rank == 10 || bomb || placingStack) {
-                handleBomb(card);
-                return true;
+                return 'bomb';
             }
             else if (valid || (card.rank == 2) || (card.rank == 5) || (card.rank == 9)){
-                handleValidPlacement(card);
-                return true;
+                return 'valid';
             }
         }
         // First card to be placed on empty
@@ -358,27 +366,41 @@ const SkitakallGame = () => {
             const placingStack = (selectedCardList.length === 4);
 
             if (card.rank == 10 || placingStack) {
-                handleBomb(card);
+                return 'bomb';
             }
             else {
-                handleValidPlacement(card);
+                return 'valid';
             }
-            return true;
         }
-        return false;
+        return 'fail';
     }
 
 
     const onDrawnCardPlayed = () => {
         const played_card = drawCardsPile.splice(0, 1);    
-        const valid = onCardPlayedHandler(played_card[0]);
-        if (!valid) {
+        const result = onCardPlayedHandler(played_card[0]);
+        if (result === 'fail') {
             onDeckPickup(played_card[0]);
         }
     }
 
 
     const onDeckPickup = (failed=null) => {
+
+        let newHand;
+        let myHand;
+        let setMyHand;
+       
+        if (user === 'Player 1') {
+            myHand = player1Hand;
+            setMyHand = setPlayer1Hand;
+
+        } 
+        else if (user === 'Player 2') {
+            myHand = player2Hand;
+            setMyHand = setPlayer2Hand;
+        }
+
         // If the deck needs to be picked up because of a failed placement then also add it to hand
         if (failed) {
             newHand = [...myHand, ...playedCardsPile, failed];
@@ -389,99 +411,241 @@ const SkitakallGame = () => {
         
         setMyHand(newHand);
         setPlayedCardsPile([])
+
+        if (user === 'Player 1') {
+            update({ updatePlayer1Hand: newHand, updatePlayedCardsPile: []});
+        }
+        else if (user === 'Player 2') {
+            update({ updatePlayer2Hand: newHand, updatePlayedCardsPile: []});
+        }
     }
 
 
+
+    const onHandCardPlayed = (played_card) => {
+
+        let myHand;
+        let setMyHand;
+       
+        if (user === 'Player 1') {
+            myHand = player1Hand;
+            setMyHand = setPlayer1Hand;
+
+        } 
+        else if (user === 'Player 2') {
+            myHand = player2Hand;
+            setMyHand = setPlayer2Hand;
+        }
+
+        const result = onCardPlayedHandler(played_card);
+
+
+        if (result === 'fail') {
+            return;
+        }
+
+    
+        let newHand = removeCardsFromHand(played_card, myHand);
+
+        if (newHand.length < 3 && drawCardsPile.length !== 0) {
+            newHand = fillHand(newHand);
+        }
+
+        setMyHand(sortCards(newHand));
+
+        let newPlayedCardsPile;
+        if (selectedCardList.length > 1) {
+            newPlayedCardsPile = [...playedCardsPile, ...selectedCardList]
+        }
+        else {
+            newPlayedCardsPile = [...playedCardsPile, played_card]
+        }
+
+
+        setPlayedCardsPile(newPlayedCardsPile);
+
+
+        if (result === 'bomb') {
+            // No turn switch, played disappears
+            if (user === 'Player 1') {
+                update({ updatePlayer1Hand: newHand, updatePlayedCardsPile: []});
+            }
+            else if (user === 'Player 2') {
+                update({ updatePlayer2Hand: newHand, updatePlayedCardsPile: []});
+            }
+        }
+        else if (result === 'valid') {
+            // Normal placement of hand card
+
+            if (user === 'Player 1') {
+                update({ updateTurn: 'Player 2', updatePlayer1Hand: newHand, updatePlayedCardsPile: newPlayedCardsPile});
+            }
+            else if (user === 'Player 2') {
+                update({ updateTurn: 'Player 1', updatePlayer2Hand: newHand, updatePlayedCardsPile: newPlayedCardsPile});
+            }
+        }
+    }
+
+    
+
+
     const onTableCardPlayed = (played_card) => {
+
+        let myHand;
+        let myVisibleCards;
+        let setMyVisibleCards;
+ 
+        if (user === 'Player 1') {
+            myHand = player1Hand;
+            myVisibleCards = player1VisibleCards;
+            setMyVisibleCards = setPlayer1VisibleCards; 
+        } 
+        else if (user === 'Player 2') {
+            myHand = player2Hand;
+            myVisibleCards = player2VisibleCards;
+            setMyVisibleCards = setPlayer2VisibleCards;
+        }
     
         if (myHand.length !== 0 || drawCardsPile.length !== 0) {
             return;
         }
 
-        const valid = onCardPlayedHandler(played_card); 
+        const result = onCardPlayedHandler(played_card); 
         const cardIndex = myVisibleCards.indexOf(played_card);
         myVisibleCards[cardIndex] = null;    
 
-        if (!valid) {
+
+        if (result === 'fail') {
             onDeckPickup(played_card);
         }
+        else if (result === 'bomb') {
+            setMyVisibleCards(myVisibleCards)
 
-        setMyVisibleCards(myVisibleCards)
+            if (user === 'Player 1') {
+                update({ updatePlayer1VisibleCards: myVisibleCards, updatePlayedCardsPile: []});
+            }
+            else if (user === 'Player 2') {
+                update({ updatePlayer2VisibleCards: myVisibleCards, updatePlayedCardsPile: []});
+            }
+        }
+        else if (result === 'valid') {
+            setMyVisibleCards(myVisibleCards)
+            setPlayedCardsPile([...playedCardsPile, played_card]);
+
+            if (user === 'Player 1') {
+                update({ updateTurn: 'Player 2', updatePlayer1VisibleCards: myVisibleCards, updatePlayedCardsPile: [...playedCardsPile, played_card]});
+            }
+            else if (user === 'Player 2') {
+                update({ updateTurn: 'Player 1', updatePlayer2VisibleCards: myVisibleCards, updatePlayedCardsPile: [...playedCardsPile, played_card]});
+            }
+        }
     }
 
 
     const onHiddenCardPlayed = (played_card) => {
+
+        let myHand;
+        let myVisibleCards;
+        let myHiddenCards;
+        let setMyHiddenCards;
+
+        if (user === 'Player 1') {
+            myHand = player1Hand;
+            myVisibleCards = player1VisibleCards;
+            myHiddenCards = player1HiddenCards;
+            setMyHiddenCards = setPlayer1HiddenCards; 
+
+        } 
+        else if (user === 'Player 2') {
+            myHand = player2Hand;
+            myVisibleCards = player2VisibleCards;
+            myHiddenCards = player2HiddenCards;
+            setMyHiddenCards = setPlayer1HiddenCards; 
+        }
         
         if (myHand.length !== 0 || drawCardsPile.length !== 0 || myVisibleCards[0] !== null || myVisibleCards[1] !== null || myVisibleCards[2] !== null) {
             return;
         }
 
-        const valid = onCardPlayedHandler(played_card);
+        const result = onCardPlayedHandler(played_card);
         const cardIndex = myHiddenCards.indexOf(played_card);
         myHiddenCards.splice(cardIndex, 1); 
 
-        if (!valid) {
+
+        if (result === 'fail') {
             onDeckPickup(played_card);
         }
+        else if (result === 'bomb') {
+            setMyHiddenCards(myHiddenCards)
 
-        setMyHiddenCards(myHiddenCards)
+            if (user === 'Player 1') {
+                update({ updatePlayer1VisibleCards: myHiddenCards, updatePlayedCardsPile: []});
+            }
+            else if (user === 'Player 2') {
+                update({ updatePlayer2VisibleCards: myHiddenCards, updatePlayedCardsPile: []});
+            }
+        }
+        else if (result === 'valid') {
+            setMyHiddenCards(myHiddenCards)
+            setPlayedCardsPile([...playedCardsPile, played_card]);
+
+            if (user === 'Player 1') {
+                update({ updateTurn: 'Player 2', updatePlayer1VisibleCards: myHiddenCards, updatePlayedCardsPile: [...playedCardsPile, played_card]});
+            }
+            else if (user === 'Player 2') {
+                update({ updateTurn: 'Player 1', updatePlayer2VisibleCards: myHiddenCards, updatePlayedCardsPile: [...playedCardsPile, played_card]});
+            }
+        }
     }
 
 
-
-
-
-
     return (
-        <View style={styles.container}>
-            <View style={{ flex: 0.35, backgroundColor: 'white'}}></View>
+        <View>
 
-            <View style={{ flex: 1, backgroundColor: 'blue'}}>
-                <SkitakallSetUp 
-                    visibleCards={opponentVisibleCards} 
-                    hiddenCards={opponentHiddenCards} 
-                    visibleHandler={() => console.log("Do nothing, not your card")}
-                    hiddenHandler={() => console.log("Do nothing, not your card")}
+            {user == 'Player 1' && (
+                <SkitakallView
+                    myHand={player1Hand}
+                    myVisibleCards={player1VisibleCards}
+                    myHiddenCards={player1HiddenCards}
+                    
+                    opponentHand={player2Hand}
+                    opponentVisibleCards={player2VisibleCards}
+                    opponentHiddenCards={player2HiddenCards}
 
+                    drawCardsPile={drawCardsPile}
+                    playedCardsPile={playedCardsPile}
+
+                    onHandCardPlayed={onHandCardPlayed}
+                    onCardSelectedHandler={onCardSelectedHandler}
+                    onTableCardPlayed={onTableCardPlayed}
+                    onHiddenCardPlayed={onHiddenCardPlayed}
+                    onDrawnCardPlayed={onDrawnCardPlayed}
+                    onDeckPickup={onDeckPickup}
                 />
-            </View>
+            )}
+           
+            {user == 'Player 2' && (
+                <SkitakallView
+                    myHand={player2Hand}
+                    myVisibleCards={player2VisibleCards}
+                    myHiddenCards={player2HiddenCards}
+                    
+                    opponentHand={player1Hand}
+                    opponentVisibleCards={player1VisibleCards}
+                    opponentHiddenCards={player1HiddenCards}
 
-            <View style={{ flex: 1, backgroundColor: 'yellow', justifyContent: 'center'}}>
-                <OpponentHand 
-                    hand={opponentHand}
+                    drawCardsPile={drawCardsPile}
+                    playedCardsPile={playedCardsPile}
+
+                    onCardPlayedHandler={onCardPlayedHandler}
+                    onCardSelectedHandler={onCardSelectedHandler}
+                    onTableCardPlayed={onTableCardPlayed}
+                    onHiddenCardPlayed={onHiddenCardPlayed}
+                    onDrawnCardPlayed={onDrawnCardPlayed}
+                    onDeckPickup={onDeckPickup}
                 />
-            </View> 
-            
+            )}
 
-            <View style={{ flex: 1.4, backgroundColor: 'red', justifyContent: 'center' }}>
-                <Table 
-                    drawCardsPile={drawCardsPile} 
-                    playedCardsPile={playedCardsPile} 
-                    drawHandler={onDrawnCardPlayed}
-                    pickUpHandler={onDeckPickup}
-                />
-            </View> 
-
-            
-            <View style={{ flex: 1, backgroundColor: 'yellow', justifyContent: 'center'}}>
-                <PlayerHand 
-                    hand={myHand} 
-                    playedHandler={onCardPlayedHandler} 
-                    selectCard={onCardSelectedHandler}
-                />
-            </View>
-
-            <View style={{ flex: 1, backgroundColor: 'blue', justifyContent: 'center'}}>
-                <SkitakallSetUp 
-                    visibleCards={myVisibleCards} 
-                    hiddenCards={myHiddenCards} 
-                    visibleHandler={onTableCardPlayed}
-                    hiddenHandler={onHiddenCardPlayed}
-                    selectCard={onCardSelectedHandler}
-                />
-            </View>
-
-            <View style={{ flex: 0.6, backgroundColor: 'white' }}></View> 
         </View>
     );
 }
