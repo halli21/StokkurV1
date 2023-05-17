@@ -21,7 +21,6 @@ const GameSession = ({socket, Game, gameCode, closeCreate}) => {
             setNumPlayers(data);
         });
 
-    
     }, []);
 
 

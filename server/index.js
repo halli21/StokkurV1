@@ -53,7 +53,6 @@ io.on("connection", (socket) => {
     });
 
     socket.on("initGame", (data) => {
-        console.log(data)
         io.to(data.room).emit("initGameState", {turn: data.turn, player1HiddenCards: data.player1HiddenCards, player1VisibleCards: data.player1VisibleCards, player1Hand: data.player1Hand, player2HiddenCards: data.player2HiddenCards, player2VisibleCards: data.player2VisibleCards, player2Hand: data.player2Hand, drawCardsPile: data.drawCardsPile});
     });
 
@@ -63,8 +62,17 @@ io.on("connection", (socket) => {
     });
 
 
-    
+    socket.on("leaveGame", () => {
+        io.to(socket.id).emit("leftGame");
+    });
 
+
+    socket.on("signalReady", (data) => {
+        io.to(data.room).emit("playerReady", {playersReady: data.playersReady});
+    });
+
+
+    
     socket.on("disconnect", () => {
         console.log(`User Disconnected: ${socket.id}`);
     });

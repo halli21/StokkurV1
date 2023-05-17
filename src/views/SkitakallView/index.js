@@ -9,41 +9,46 @@ import PlayerHand from '../../views/PlayerHand';
 import OpponentHand from '../../views/OpponentHand';
 
 
-const SkitakallView = ({myHand, myVisibleCards, myHiddenCards, opponentHand, opponentVisibleCards, opponentHiddenCards, drawCardsPile, playedCardsPile, onHandCardPlayed, onCardSelectedHandler, onTableCardPlayed, onHiddenCardPlayed, onDrawnCardPlayed, onDeckPickup}) => {
+const SkitakallView = ({user, turn, myHand, myVisibleCards, myHiddenCards, opponentHand, opponentVisibleCards, opponentHiddenCards, drawCardsPile, playedCardsPile, onHandCardPlayed, onCardSelectedHandler, onTableCardPlayed, onHiddenCardPlayed, onDrawnCardPlayed, onDeckPickup}) => {
 
 
     return (
         <View style={styles.container}>
             <View style={{ flex: 0.35, backgroundColor: 'white', width: width}}></View>
 
-            <View style={{ flex: 1, backgroundColor: 'blue'}}>
+            <View style={{ flex: 1, backgroundColor: 'white'}}>
                 <SkitakallSetUp 
                     visibleCards={opponentVisibleCards} 
                     hiddenCards={opponentHiddenCards} 
                     visibleHandler={() => console.log("Do nothing, not your card")}
                     hiddenHandler={() => console.log("Do nothing, not your card")}
+                    selectCard={onCardSelectedHandler}
 
                 />
             </View>
 
-            <View style={{ flex: 1, backgroundColor: 'yellow', justifyContent: 'center'}}>
+            <View style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center'}}>
                 <OpponentHand 
                     hand={opponentHand}
                 />
             </View> 
             
 
-            <View style={{ flex: 1.4, backgroundColor: 'red', justifyContent: 'center' }}>
-                <Table 
+            <View style={{ flex: 1.4, backgroundColor: 'white', justifyContent: 'center' }}>
+                <Table
+                    user={user}
+                    turn={turn}
+                    
                     drawCardsPile={drawCardsPile} 
                     playedCardsPile={playedCardsPile} 
                     drawHandler={onDrawnCardPlayed}
                     pickUpHandler={onDeckPickup}
+                    selectCard={onCardSelectedHandler}
                 />
             </View> 
 
             
-            <View style={{ flex: 1, backgroundColor: 'yellow', justifyContent: 'center'}}>
+            <View style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center'}}>
                 <PlayerHand 
                     hand={myHand} 
                     playedHandler={onHandCardPlayed} 
@@ -51,7 +56,7 @@ const SkitakallView = ({myHand, myVisibleCards, myHiddenCards, opponentHand, opp
                 />
             </View>
 
-            <View style={{ flex: 1, backgroundColor: 'blue', justifyContent: 'center'}}>
+            <View style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center'}}>
                 <SkitakallSetUp 
                     visibleCards={myVisibleCards} 
                     hiddenCards={myHiddenCards} 

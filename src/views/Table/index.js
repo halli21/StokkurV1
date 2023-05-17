@@ -5,7 +5,7 @@ import styles from "./styles";
 import Card from '../../components/Card';
 import blank from '../../resources/blank.png';
 
-const Table = ({drawCardsPile, playedCardsPile, drawHandler, pickUpHandler}) => {
+const Table = ({user, turn, drawCardsPile, playedCardsPile, drawHandler, pickUpHandler, selectCard}) => {
 
     const drawIsEmpty = drawCardsPile.length === 0;
     const playedIsEmpty = playedCardsPile.length === 0;
@@ -38,11 +38,10 @@ const Table = ({drawCardsPile, playedCardsPile, drawHandler, pickUpHandler}) => 
                         />
                     </View>
                 )}  
-
             </View>
 
 
-            <View style={styles.placeHolder}>
+            <View style={[styles.placeHolder, user === turn && styles.yourTurn]}>
                 <Text style={styles.number}>{playedCardsPile.length}</Text>
                 
                 {!playedIsEmpty ? (
@@ -54,6 +53,7 @@ const Table = ({drawCardsPile, playedCardsPile, drawHandler, pickUpHandler}) => 
                         hidden={false}
                         onClick={() => pickUpHandler()}
                         onLongPress={() => console.log('played')}
+                        onLongPressHandler={{selectCard : selectCard, card : playedCardsPile[size - 1]}}
                     />  
                 ) : (
                     <View style={styles.outline}>

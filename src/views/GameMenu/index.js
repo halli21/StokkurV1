@@ -17,6 +17,11 @@ const GameMenu = ({socket}) => {
         socket.on("validJoin", () => {
             setJoinedRoom(true);
         });
+
+        socket.on("leftGame", () => {
+            setRoom('');
+            setJoinedRoom(false);
+        });
     
     }, []);
 

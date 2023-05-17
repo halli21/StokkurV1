@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import React, { useState, useEffect } from 'react';
+import { View, TouchableOpacity, Image } from "react-native";
 
 import styles from "./styles";
 
@@ -75,6 +75,10 @@ const Card = ({ id, rank, suit, selected, hidden, onClick, onLongPress, onLongPr
 
     const [isSelected, setIsSelected] = useState(selected);
     const [isHidden, setIsHidden] = useState(hidden);
+
+    useEffect(() => {
+        setIsSelected(false);
+    }, [id]);
 
     const handleLongPress = () => {
       

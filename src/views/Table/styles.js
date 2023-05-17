@@ -30,7 +30,11 @@ export default StyleSheet.create({
         resizeMode: 'contain',
         width: 0.2 * width,
         height: 0.3 * width,
-        borderRadius: 5,
-    }
+    },
+    yourTurn: {
+        shadowColor: "green", 
+        shadowRadius: 10, 
+        shadowOpacity: 100
+    } 
 
 });
