@@ -8,6 +8,7 @@ const _ = require('lodash');
 import createNewGame from "../../utils/generateSkitakall";
 import SkitakallView from '../../views/SkitakallView';
 import GameOver from '../../views/GameOver';
+import SkitakallSetUp from '../../views/SkitakallSetUp';
 
 import Spinner from '../Spinner';
 
@@ -373,6 +374,24 @@ const SkitakallGame = ({socket, room, user, numPlayers}) => {
 
 
     const onCardPlayedHandler = (card) => {
+
+        if (selectedCardList.length > 0) {
+            let inSelected = false;
+            for (let i = 0; i < selectedCardList.length; i++) {
+                if (selectedCardList[i] === card) {
+                    inSelected = true;
+                    break;
+                }
+            }
+     
+            if (selectedCardList[0].rank === card.rank && !inSelected) {
+                selectedCardList.push(card);
+            }
+            else if (!inSelected) {
+                return 'fail';
+            }
+           
+        }
     
         if (playedCardsPile.length > 0) {
 
@@ -775,16 +794,19 @@ const SkitakallGame = ({socket, room, user, numPlayers}) => {
                 </TouchableOpacity>
             )}
 
-            {(readyToStart && gameSetUp == false) && (
+            {(readyToStart && !gameSetUp) && (
                 <View style={styles.waitingTextContainer}>
-                    <Text style={{}}>Waiting for other players</Text>
+                    <Text style={styles.waitText}>Waiting for other players</Text>
                     <View style={styles.readySpinner}><Spinner/></View>
                 </View>
 
             )}
 
+
             {user == 'Player 1' && (
                 <SkitakallView
+                    gameSetUp={gameSetUp}
+
                     user={user}
                     turn={turn}
 
@@ -810,6 +832,8 @@ const SkitakallGame = ({socket, room, user, numPlayers}) => {
            
             {user == 'Player 2' && (
                 <SkitakallView
+                    gameSetUp={gameSetUp}
+
                     user={user}
                     turn={turn}
 

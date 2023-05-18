@@ -11,7 +11,7 @@ export default StyleSheet.create({
     readyButtonContainer: {
         position: 'absolute',
         alignSelf: 'center',
-        top: height * 0.53,
+        top: height * 0.46,
         zIndex: 9999,
     },
     readyButton: {
@@ -23,7 +23,7 @@ export default StyleSheet.create({
         borderLeftWidth: 2,
         borderRadius: 8,
         alignItems: 'center',
-        backgroundColor: '#E6E6E6'
+        backgroundColor: 'white'
     },
     readyText: {
         fontSize: width * 0.06,
@@ -33,12 +33,14 @@ export default StyleSheet.create({
     waitingTextContainer: {
         position: 'absolute',
         alignSelf: 'center',
-        top: height * 0.575,
+        top: height * 0.475,
         zIndex: 9999,
     },
     readySpinner: {
-        alignSelf: "flex-end",
-        marginRight: -2 * rem,
-        marginTop: -1.1 * rem,
-    }
+        marginTop: 10
+    },
+    waitText: {
+        fontSize: width * 0.05,
+        fontWeight: '400'
+    },
 })

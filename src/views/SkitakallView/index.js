@@ -9,7 +9,7 @@ import PlayerHand from '../../views/PlayerHand';
 import OpponentHand from '../../views/OpponentHand';
 
 
-const SkitakallView = ({user, turn, myHand, myVisibleCards, myHiddenCards, opponentHand, opponentVisibleCards, opponentHiddenCards, drawCardsPile, playedCardsPile, onHandCardPlayed, onCardSelectedHandler, onTableCardPlayed, onHiddenCardPlayed, onDrawnCardPlayed, onDeckPickup}) => {
+const SkitakallView = ({gameSetUp, user, turn, myHand, myVisibleCards, myHiddenCards, opponentHand, opponentVisibleCards, opponentHiddenCards, drawCardsPile, playedCardsPile, onHandCardPlayed, onCardSelectedHandler, onTableCardPlayed, onHiddenCardPlayed, onDrawnCardPlayed, onDeckPickup}) => {
 
 
     return (
@@ -35,16 +35,18 @@ const SkitakallView = ({user, turn, myHand, myVisibleCards, myHiddenCards, oppon
             
 
             <View style={{ flex: 1.4, backgroundColor: 'white', justifyContent: 'center' }}>
-                <Table
-                    user={user}
-                    turn={turn}
-                    
-                    drawCardsPile={drawCardsPile} 
-                    playedCardsPile={playedCardsPile} 
-                    drawHandler={onDrawnCardPlayed}
-                    pickUpHandler={onDeckPickup}
-                    selectCard={onCardSelectedHandler}
-                />
+                {gameSetUp && (
+                    <Table
+                        user={user}
+                        turn={turn}
+                        
+                        drawCardsPile={drawCardsPile} 
+                        playedCardsPile={playedCardsPile} 
+                        drawHandler={onDrawnCardPlayed}
+                        pickUpHandler={onDeckPickup}
+                        selectCard={onCardSelectedHandler}
+                    />
+                )}
             </View> 
 
             
