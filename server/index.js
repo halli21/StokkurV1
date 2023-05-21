@@ -9,12 +9,30 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000",
+        origin: "*",
         method: ["GET", "POST"],
     },
 });
 
 
+const availableRooms = {};
+
+const createRoom = (roomId, hostName) => {
+    availableRooms[roomId] = {
+        host: hostName,
+        roomId: roomId
+    };
+}
+
+
+const closeRoom = (roomId) => {
+    delete availableRooms[roomId];
+}
+
+const getAvailableRooms = () => {
+    const rooms = Object.values(availableRooms);
+    return rooms;
+}
 
 
 io.on("connection", (socket) => {
@@ -23,9 +41,11 @@ io.on("connection", (socket) => {
     socket.on("create_room", (data) => {
         console.log(`Room created by ${socket.id}`)
 
-        socket.join(data);
+        socket.join(data.gameCode);
+
+        createRoom(data.gameCode, data.host);
         
-        const size = io.sockets.adapter.rooms.get(data).size;
+        const size = io.sockets.adapter.rooms.get(data.gameCode).size;
         io.to(socket.id).emit("getUserInfo", size);
     });
 
@@ -69,6 +89,13 @@ io.on("connection", (socket) => {
 
     socket.on("signalReady", (data) => {
         io.to(data.room).emit("playerReady", {playersReady: data.playersReady});
+    });
+
+
+
+    socket.on("getAvailableGames", () => {
+        const openGames = getAvailableRooms();
+        io.to(socket.id).emit("openGames", openGames);
     });
 
 

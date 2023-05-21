@@ -439,7 +439,7 @@ const SkitakallGame = ({socket, room, user, numPlayers}) => {
 
 
     const onDrawnCardPlayed = () => {
-        if (user !== turn || gameSetUp === false) {
+        if (user !== turn || gameSetUp === false || selectedCardList.length > 0) {
             return;
         }
 
@@ -463,7 +463,7 @@ const SkitakallGame = ({socket, room, user, numPlayers}) => {
 
 
     const onDeckPickup = (failed=null) => {
-        if (user !== turn || gameSetUp === false) {
+        if (user !== turn || gameSetUp === false || selectedCardList.length > 0) {
             return;
         }
 

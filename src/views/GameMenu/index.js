@@ -8,7 +8,7 @@ import GameSession from "../GameSession";
 import SkitakallGame from "../../components/SkitakallGame";
 
 
-const GameMenu = ({socket}) => {
+const GameMenuAlt = ({socket}) => {
 
     const [room, setRoom] = useState('');
     const [joinedRoom, setJoinedRoom] = useState(false);
@@ -76,4 +76,4 @@ const GameMenu = ({socket}) => {
     );
 }
 
-export default GameMenu;
+export default GameMenuAlt;
