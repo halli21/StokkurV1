@@ -19,6 +19,7 @@ const GameMenu = ({socket, name}) => {
 
     useEffect(() => {
         socket.on("validJoin", () => {
+            setJoinViewOpen(false);
             setJoinedRoom(true);
         });
 
@@ -38,6 +39,7 @@ const GameMenu = ({socket, name}) => {
     };
 
     const closeCreate = () => {
+        socket.emit("gameNotAvailable", room);
         setRoom('');
         setJoinedRoom(false);
     };
@@ -51,7 +53,6 @@ const GameMenu = ({socket, name}) => {
 
 
     const openJoinView = () => {
-        socket.emit("getAvailableGames");
         setJoinViewOpen(true);
     };
 
@@ -98,7 +99,7 @@ const GameMenu = ({socket, name}) => {
                 </View>
 
             ) : (
-                <GameSession socket={socket} Game={SkitakallGame} gameCode={room} closeCreate={closeCreate}/>
+                <GameSession socket={socket} name={name} Game={SkitakallGame} gameCode={room} closeCreate={closeCreate}/>
             )}  
         </View>
     );

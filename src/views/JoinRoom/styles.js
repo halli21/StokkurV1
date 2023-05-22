@@ -47,19 +47,20 @@ export default StyleSheet.create({
         //backgroundColor: 'green',
     },
     gameButton: {
+        justifyContent: 'center',
         alignSelf: 'center',
         borderWidth: 1,
-        paddingHorizontal: width * 0.175,
-        paddingVertical: height * 0.01,
+        height: height * 0.05,
+        width: width * 0.5,
         borderRadius: 8,
         backgroundColor: 'white',
     },
     option: {
         paddingVertical: height * 0.02,
     },
-    heading: {
-        width: width,
-        padding: height * 0.05
-    }
+    hostText: {
+        fontSize: 20,
+        alignSelf: 'center',
+    },
 
 });

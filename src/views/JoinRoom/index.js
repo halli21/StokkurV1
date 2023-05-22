@@ -6,7 +6,21 @@ import styles from "./styles";
 
 const JoinRoom = ({socket, joinGame, closeJoinView}) => {
 
+    const MAX_LENGTH = 12;
+
     const [openGames, setOpenGames] = useState([]);
+
+    useEffect(() => {
+        const fetchAvailableGames = () => {
+            socket.emit("getAvailableGames");
+        };
+        
+        fetchAvailableGames();
+        const interval = setInterval(fetchAvailableGames, 5000);
+        return () => clearInterval(interval);
+
+    }, []);
+
 
     useEffect(() => {
         socket.on("openGames", (data) => {
@@ -24,7 +38,7 @@ const JoinRoom = ({socket, joinGame, closeJoinView}) => {
                 {openGames.map((game) => (
                     <View key={game.roomId} style={styles.option}>
                         <TouchableOpacity style={styles.gameButton} onPress={() => joinGame(game.roomId)}>
-                            <Text style={styles.backText}>{game.host}</Text>
+                            <Text style={styles.hostText}>{game.host.length > MAX_LENGTH ? `${game.host.slice(0, MAX_LENGTH)}...` : game.host}</Text>
                         </TouchableOpacity>
                     </View>
                 ))}

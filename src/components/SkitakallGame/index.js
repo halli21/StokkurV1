@@ -8,7 +8,6 @@ const _ = require('lodash');
 import createNewGame from "../../utils/generateSkitakall";
 import SkitakallView from '../../views/SkitakallView';
 import GameOver from '../../views/GameOver';
-import SkitakallSetUp from '../../views/SkitakallSetUp';
 
 import Spinner from '../Spinner';
 
@@ -20,7 +19,7 @@ const suitValues = {
 };
 
 
-const SkitakallGame = ({socket, room, user, numPlayers}) => {
+const SkitakallGame = ({socket, name, room, user, numPlayers}) => {
 
     const [gameSetUp, setGameSetUp] = useState(false)
     const [readyToStart, setReadyToStart] = useState(false)
@@ -178,14 +177,14 @@ const SkitakallGame = ({socket, room, user, numPlayers}) => {
         const player1HiddenEmpty = (player1HiddenCards.length === 0);
         if (updatedPlayer1Hand.length === 0 && player1VisibleEmpty && player1HiddenEmpty) {
             setGameOver(true)
-            return {gameOver : true, winner : 'Player 1'};;
+            return {gameOver : true, winner : name};;
         }
 
         const player2VisibleEmpty = (player2VisibleCards[0] === null && player2VisibleCards[1] === null && player2VisibleCards[2] === null);
         const player2HiddenEmpty = (player2HiddenCards.length === 0);
         if (updatedPlayer2Hand.length === 0 && player2VisibleEmpty && player2HiddenEmpty) {
             setGameOver(true)
-            return {gameOver : true, winner : 'Player 2'};;
+            return {gameOver : true, winner : name};;
         }
         return {gameOver : false, winner : ''};
     }

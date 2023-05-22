@@ -17,15 +17,14 @@ const io = new Server(server, {
 
 const availableRooms = {};
 
-const createRoom = (roomId, hostName) => {
+const addRoom = (roomId, hostName) => {
     availableRooms[roomId] = {
         host: hostName,
         roomId: roomId
     };
 }
 
-
-const closeRoom = (roomId) => {
+const removeRoom = (roomId) => {
     delete availableRooms[roomId];
 }
 
@@ -43,7 +42,7 @@ io.on("connection", (socket) => {
 
         socket.join(data.gameCode);
 
-        createRoom(data.gameCode, data.host);
+        addRoom(data.gameCode, data.host);
         
         const size = io.sockets.adapter.rooms.get(data.gameCode).size;
         io.to(socket.id).emit("getUserInfo", size);
@@ -53,7 +52,9 @@ io.on("connection", (socket) => {
 
         const roomExists = io.sockets.adapter.rooms.get(data);
 
-        if (roomExists) {
+        const isAvailable = data in availableRooms;
+
+        if (roomExists && isAvailable) {
             socket.join(data);
 
             io.to(socket.id).emit("validJoin");
@@ -62,7 +63,9 @@ io.on("connection", (socket) => {
             io.to(socket.id).emit("getUserInfo", size);
 
             if (size >= 2) {
-                console.log(`Room full, size is ${size}`)
+                console.log(`Room full, size is ${size}`);
+
+                removeRoom(data);
 
                 io.to(data).emit("roomFull", size);
             }
@@ -79,6 +82,11 @@ io.on("connection", (socket) => {
 
     socket.on("updateGame", (data) => {
         io.to(data.room).emit("updateGameState", {gameOver: data.gameOver, winner: data.winner, turn: data.turn, player1HiddenCards: data.player1HiddenCards, player1VisibleCards: data.player1VisibleCards, player1Hand: data.player1Hand, player2HiddenCards: data.player2HiddenCards, player2VisibleCards: data.player2VisibleCards, player2Hand: data.player2Hand, drawCardsPile: data.drawCardsPile, playedCardsPile: data.playedCardsPile});
+    });
+
+
+    socket.on("gameNotAvailable", (data) => {
+        removeRoom(data);
     });
 
 
