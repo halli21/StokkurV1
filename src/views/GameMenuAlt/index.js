@@ -51,6 +51,7 @@ const GameMenu = ({socket, name}) => {
         }
     };
 
+    
 
     const openJoinView = () => {
         setJoinViewOpen(true);

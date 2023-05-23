@@ -25,7 +25,6 @@ const SkitakallGame = ({socket, name, room, user, numPlayers}) => {
     const [readyToStart, setReadyToStart] = useState(false)
     const [playersReady, setPlayersReady] = useState(0)
 
-
     const [gameOver, setGameOver] = useState(false)
     const [winner, setWinner] = useState('')
     const [turn, setTurn] = useState('')
@@ -173,6 +172,7 @@ const SkitakallGame = ({socket, name, room, user, numPlayers}) => {
     }
 
     const checkWinner = (updatedPlayer1Hand, updatedPlayer2Hand) => {
+
         const player1VisibleEmpty = (player1VisibleCards[0] === null && player1VisibleCards[1] === null && player1VisibleCards[2] === null);
         const player1HiddenEmpty = (player1HiddenCards.length === 0);
         if (updatedPlayer1Hand.length === 0 && player1VisibleEmpty && player1HiddenEmpty) {
@@ -186,6 +186,7 @@ const SkitakallGame = ({socket, name, room, user, numPlayers}) => {
             setGameOver(true)
             return {gameOver : true, winner : name};;
         }
+
         return {gameOver : false, winner : ''};
     }
 

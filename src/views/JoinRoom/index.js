@@ -43,8 +43,7 @@ const JoinRoom = ({socket, joinGame, closeJoinView}) => {
                     </View>
                 ))}
             </ScrollView>
-    
-
+            
             <TouchableOpacity onPress={() => closeJoinView()} style={styles.loadButton}><Text style={styles.backText}>Back</Text></TouchableOpacity>
         </View>
    

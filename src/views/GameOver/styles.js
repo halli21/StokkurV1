@@ -15,7 +15,7 @@ export default StyleSheet.create({
         zIndex: 2,
         alignSelf: 'center',
         top: height * 0.27,
-        paddingHorizontal: width * 0.25,
+        width: width * 0.9,
         paddingBottom: width * 0.3,
         borderRadius: 50,
         borderWidth: 1,
@@ -46,6 +46,7 @@ export default StyleSheet.create({
         bottom: height * 0.05
     },
     trophy: {
+        alignSelf: 'center',
         resizeMode: 'contain',
         width: 0.35 * width,
         height: 0.4 * width,

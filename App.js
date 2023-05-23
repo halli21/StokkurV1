@@ -25,7 +25,6 @@ export default function App() {
         <View>
             {!loggedIn && (
                 <LogIn setName={setName} giveName={giveName}></LogIn>
-
             )} 
 
             {loggedIn && (
