@@ -216,9 +216,32 @@ io.on("connection", (socket) => {
         const fromName = connectedUsers[socket.id].name;
         io.to(data.toSocketId).emit("inviteRecieved", {fromSocketId: socket.id, fromName: fromName});
     });
+    
+
+    socket.on("inviteAccepted", (data) => {
+        const gameCode = '1';
+
+        console.log(`Socket Id: ${socket.id}, data: ${data.fromName} : ${data.fromSocketId}`)
+
+        socket.join(gameCode);
+        addRoom(gameCode, data.fromName);
 
 
+        io.to(socket.id).emit("inviteGame", gameCode);
 
+        const size = io.sockets.adapter.rooms.get(gameCode).size;
+        io.to(socket.id).emit("getUserInfo", size);
+
+
+        const otherSocket = io.sockets.sockets.get(data.fromSocketId);
+
+        otherSocket.join(gameCode);
+        io.to(otherSocket.id).emit("inviteGame", gameCode);
+        io.to(otherSocket.id).emit("getUserInfo", size);
+
+        startGame(gameCode);
+        io.to(gameCode).emit("startGame");
+    });
 
     
     socket.on("disconnect", () => {

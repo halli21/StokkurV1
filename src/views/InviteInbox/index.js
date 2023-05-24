@@ -8,8 +8,8 @@ const InviteInbox = ({socket, inbox, closeInviteInbox}) => {
 
     const MAX_LENGTH = 12;
 
-    const acceptInvite = () => {
-        
+    const acceptInvite = (invite) => {
+        socket.emit("inviteAccepted", invite);
     }
 
     return (
@@ -19,7 +19,7 @@ const InviteInbox = ({socket, inbox, closeInviteInbox}) => {
             <ScrollView horizontal={false} style={styles.gameList}>
                 {inbox.map((invite) => (
                     <View key={invite.fromSocketId} style={styles.option}>
-                        <TouchableOpacity style={styles.gameButton}>
+                        <TouchableOpacity style={styles.gameButton} onPress={() => acceptInvite(invite)}>
                             <Text style={styles.hostText}>
                                 {invite.fromName && invite.fromName.length > MAX_LENGTH
                                     ? `${invite.fromName.slice(0, MAX_LENGTH)}...`

@@ -35,7 +35,6 @@ const GameMenu = ({socket, name}) => {
             setJoinedRoom(false);
         });
 
-
         socket.on("inviteRecieved", (data) => {
             setInbox((inbox) => {
                 const existingInvite = inbox.find((invite) => invite.fromSocketId === data.fromSocketId);
@@ -47,6 +46,14 @@ const GameMenu = ({socket, name}) => {
                     return [...inbox, data];
                 }
             });
+        });
+
+
+        socket.on("inviteGame", (data) => {
+            console.log(`inviteGame -- data ${data}`)
+            setInviteInboxOpen(false);
+            setRoom(data);
+            setJoinedRoom(true);
         });
     
     }, []);
