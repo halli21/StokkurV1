@@ -35,20 +35,40 @@ export default StyleSheet.create({
         borderWidth: 0.5,
         padding: 10,
     },
-    createButton: {
+    menuButton: {
         borderColor: 'black',
         borderWidth: 2,
         padding: 5,
         borderRadius: 10,
-        marginBottom: height * 0.02
+        marginBottom: height * 0.02,
+        width: width * 0.63,
     },
     buttonText: {
         fontSize: width * 0.08,
-        paddingHorizontal: width * 0.07
+        paddingHorizontal: width * 0.07,
+        alignSelf: 'center'
     },
     psText: {
         position: 'absolute',
         bottom: 100,
         opacity: 0.5
+    },
+    notification: {
+        position: 'absolute',
+        borderColor: 'black',
+        borderWidth: 2,
+        padding: 5,
+        paddingHorizontal: 12,
+        borderRadius: 50,
+        backgroundColor: '#FF3B3B'
+    },
+    count: {
+        fontSize: 20,
+        fontWeight: '500'
+    },
+    inboxContainer: {
+        //backgroundColor: 'green',
+        paddingHorizontal: width * 0.03,
+        paddingTop: width * 0.03
     }
 });

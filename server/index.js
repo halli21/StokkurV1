@@ -3,6 +3,7 @@ const app = express();
 const http = require("http");
 const cors = require("cors");
 const { Server } = require("socket.io");
+const { Console } = require("console");
 app.use(cors());
 
 const server = http.createServer(app);
@@ -14,9 +15,25 @@ const io = new Server(server, {
     },
 });
 
-
+const connectedUsers = {};
 const activeRooms = {};
 const roomLocks = {};
+
+
+const addUser = (socketId) => {
+    connectedUsers[socketId] = {
+        socketId: socketId,
+        name: '',
+    };
+}
+
+const getConnectedUsers = (mySocketId) => {
+    const users = Object.values(connectedUsers);
+    const allUsers = users.filter((user) => user.socketId !== mySocketId && user.name !== '');
+    return allUsers;
+}
+
+
 
 
 const addRoom = (roomId, hostName) => {
@@ -49,6 +66,12 @@ const getAvailableRooms = () => {
 
 io.on("connection", (socket) => {
     console.log(`User Connected: ${socket.id}`);
+    addUser(socket.id);
+
+    socket.on("saveName", (data) => {
+        connectedUsers[socket.id].name = data;
+    });
+
 
     socket.on("create_room", (data) => {
         console.log(`Room created by ${socket.id}`)
@@ -137,6 +160,8 @@ io.on("connection", (socket) => {
     });
 
 
+    // IN CASE OF PRE GAME
+
     socket.on("signalReady", (data) => {
 
         async function signal() {
@@ -171,16 +196,34 @@ io.on("connection", (socket) => {
     });
 
 
+    // GET DATA
 
     socket.on("getAvailableGames", () => {
         const openGames = getAvailableRooms();
         io.to(socket.id).emit("openGames", openGames);
     });
 
+    socket.on("getConnectedPlayers", () => {
+        const playersOnline = getConnectedUsers(socket.id);
+        io.to(socket.id).emit("playersOnline", playersOnline);
+    });
+
+
+
+    // INVITES
+
+    socket.on("inviteSent", (data) => {
+        const fromName = connectedUsers[socket.id].name;
+        io.to(data.toSocketId).emit("inviteRecieved", {fromSocketId: socket.id, fromName: fromName});
+    });
+
+
+
 
     
     socket.on("disconnect", () => {
         console.log(`User Disconnected: ${socket.id}`);
+        delete connectedUsers[socket.id];
     });
 });
 

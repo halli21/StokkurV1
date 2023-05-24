@@ -23,6 +23,7 @@ export default function App() {
         if (name !== "") {
             setName(name);
             setLoggedIn(true);
+            socket.emit("saveName", name);
         }
     }
 

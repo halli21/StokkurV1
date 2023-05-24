@@ -7,6 +7,8 @@ import GameSession from "../GameSession";
 
 import SkitakallGame from "../../components/SkitakallGame";
 import JoinRoom from "../JoinRoom";
+import OnlinePlayers from "../OnlinePlayers";
+import InviteInbox from "../InviteInbox";
 
 
 const GameMenu = ({socket, name}) => {
@@ -15,6 +17,11 @@ const GameMenu = ({socket, name}) => {
     const [joinedRoom, setJoinedRoom] = useState(false);
 
     const [joinViewOpen, setJoinViewOpen] = useState(false);
+
+    const [inviteViewOpen, setInviteViewOpen] = useState(false);
+
+    const [inviteInboxOpen, setInviteInboxOpen] = useState(false);
+    const [inbox, setInbox] = useState([]);
 
 
     useEffect(() => {
@@ -26,6 +33,20 @@ const GameMenu = ({socket, name}) => {
         socket.on("leftGame", () => {
             setRoom('');
             setJoinedRoom(false);
+        });
+
+
+        socket.on("inviteRecieved", (data) => {
+            setInbox((inbox) => {
+                const existingInvite = inbox.find((invite) => invite.fromSocketId === data.fromSocketId);
+                if (existingInvite) {
+                    const updatedInbox = inbox.filter((invite) => invite.fromSocketId !== data.fromSocketId);
+                    return [...updatedInbox, data];
+                } 
+                else {
+                    return [...inbox, data];
+                }
+            });
         });
     
     }, []);
@@ -51,7 +72,7 @@ const GameMenu = ({socket, name}) => {
         }
     };
 
-    
+
 
     const openJoinView = () => {
         setJoinViewOpen(true);
@@ -67,8 +88,37 @@ const GameMenu = ({socket, name}) => {
     };
 
 
+
+    const openInviteView = () => {
+        setInviteViewOpen(true);
+    };
+
+    const closeInviteView = () => {
+        setInviteViewOpen(false);
+    };
+
+    const openInviteInbox = () => {
+        setInviteInboxOpen(true);
+    };
+
+    const closeInviteInbox = () => {
+        setInviteInboxOpen(false);
+    };
+
+
+    
+
+
     return (
         <View style={styles.container}>
+
+            {inviteInboxOpen && (
+                <InviteInbox socket={socket} inbox={inbox} closeInviteInbox={closeInviteInbox}></InviteInbox>
+            )}
+
+            {inviteViewOpen && (
+                <OnlinePlayers socket={socket} inbox={inbox} closeInviteView={closeInviteView}></OnlinePlayers>
+            )}
 
             {joinViewOpen && (
                 <JoinRoom socket={socket} joinGame={joinFromView} closeJoinView={closeJoinView}></JoinRoom>
@@ -76,12 +126,34 @@ const GameMenu = ({socket, name}) => {
 
             {!joinedRoom ? (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                    <View style={styles.createButton}>
+                    <View style={styles.inboxContainer}>
+                        <View style={styles.menuButton}>
+                            <TouchableOpacity onPress={openInviteInbox}>
+                                <Text style={styles.buttonText}>Inbox</Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        {(inbox.length > 0) && (
+                            <View style={styles.notification}>
+                                <Text style={styles.count}>{inbox.length}</Text>
+                            </View>
+                        )}
+                        
+                    </View>
+
+                    <View style={styles.menuButton}>
+                        <TouchableOpacity onPress={openInviteView}>
+                            <Text style={styles.buttonText}>Invite Players</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.menuButton}>
                         <TouchableOpacity onPress={openJoinView}>
                             <Text style={styles.buttonText}>Open Games</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={styles.createButton}>
+
+                    <View style={styles.menuButton}>
                         <TouchableOpacity onPress={createRoom}>
                             <Text style={styles.buttonText}>Create Game</Text>
                         </TouchableOpacity>
