@@ -61,43 +61,61 @@ io.on("connection", (socket) => {
         io.to(socket.id).emit("getUserInfo", size);
     });
 
+
     socket.on("join_room", (data) => {
 
         const roomExists = io.sockets.adapter.rooms.get(data);
 
-        const started = gameStarted(data);
-
+        if (roomExists) {
+            async function join() {
+                async function acquireLock() {
+                    while (roomLocks[data]) {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                    roomLocks[data] = true;
+                }
     
-        if (roomExists && !started && !roomLocks[data]) {
-            roomLocks[data] = true;
+                await acquireLock();
+                console.log(`User ${socket.id} acquired lock`);
+    
+                roomLocks[data] = true;
 
-            socket.join(data);
+                const started = gameStarted(data);
+                
+                if (!started) {
+                    console.log('joining game')
 
-            io.to(socket.id).emit("validJoin");
-            
-            const size = io.sockets.adapter.rooms.get(data).size;
-            io.to(socket.id).emit("getUserInfo", size);
+                    socket.join(data);
 
-            if (size >= 2) {              
-                startGame(data);
-                io.to(data).emit("startGame");
+                    io.to(socket.id).emit("validJoin");
+
+                    const size = io.sockets.adapter.rooms.get(data).size;
+                    io.to(socket.id).emit("getUserInfo", size);
+
+
+                    if (size >= 2) {              
+                        startGame(data);
+                        io.to(data).emit("startGame");
+                    }
+                }
+                else {
+                    console.log('cant join, game started')
+                }
+
+                delete roomLocks[data];                
             }
-
-            setTimeout(() => {
-                delete roomLocks[data];
-            }, 1000);
+    
+                    
+            join().then(() => {
+                console.log('finished critical zone');
+            });
           
-        }
-        else if (roomLocks[data]){
-            console.log("Lock taken")
-        }
-        else if (started){
-            console.log("game started")
         }
         else {
             console.log("No room exists")
         }
     });
+
 
     socket.on("initGame", (data) => {
         io.to(data.room).emit("initGameState", {turn: data.turn, player1HiddenCards: data.player1HiddenCards, player1VisibleCards: data.player1VisibleCards, player1Hand: data.player1Hand, player2HiddenCards: data.player2HiddenCards, player2VisibleCards: data.player2VisibleCards, player2Hand: data.player2Hand, drawCardsPile: data.drawCardsPile});
