@@ -115,11 +115,8 @@ const SkitakallGame = ({socket, name, room, user, numPlayers}) => {
         })
 
 
-        socket.on("playerReady", (data) => {
-            setPlayersReady(data.playersReady)
-            if (data.playersReady == 2) {
-                setGameSetUp(true);
-            }
+        socket.on("playersReady", () => {
+            setGameSetUp(true);
         })
          
     }, [])
@@ -165,10 +162,7 @@ const SkitakallGame = ({socket, name, room, user, numPlayers}) => {
 
     const readyToPlay = () => {
         setReadyToStart(true);
-        socket.emit("signalReady", {
-            room: room,
-            playersReady: playersReady + 1,
-        })
+        socket.emit("signalReady", room);
     }
 
     const checkWinner = (updatedPlayer1Hand, updatedPlayer2Hand) => {

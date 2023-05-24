@@ -15,22 +15,35 @@ const io = new Server(server, {
 });
 
 
-const availableRooms = {};
+const activeRooms = {};
+const roomLocks = {};
+
 
 const addRoom = (roomId, hostName) => {
-    availableRooms[roomId] = {
+    activeRooms[roomId] = {
         host: hostName,
-        roomId: roomId
+        roomId: roomId,
+        gameStarted: false,
+        playersReady: 0
     };
 }
 
 const removeRoom = (roomId) => {
-    delete availableRooms[roomId];
+    delete activeRooms[roomId];
+}
+
+const gameStarted = (roomId) => {
+    return activeRooms[roomId].gameStarted;
+}
+
+const startGame = (roomId) => {
+    activeRooms[roomId].gameStarted = true;
 }
 
 const getAvailableRooms = () => {
-    const rooms = Object.values(availableRooms);
-    return rooms;
+    const rooms = Object.values(activeRooms);
+    const availableRooms = rooms.filter(room => !room.gameStarted);
+    return availableRooms;
 }
 
 
@@ -52,9 +65,12 @@ io.on("connection", (socket) => {
 
         const roomExists = io.sockets.adapter.rooms.get(data);
 
-        const isAvailable = data in availableRooms;
+        const started = gameStarted(data);
 
-        if (roomExists && isAvailable) {
+    
+        if (roomExists && !started && !roomLocks[data]) {
+            roomLocks[data] = true;
+
             socket.join(data);
 
             io.to(socket.id).emit("validJoin");
@@ -62,13 +78,21 @@ io.on("connection", (socket) => {
             const size = io.sockets.adapter.rooms.get(data).size;
             io.to(socket.id).emit("getUserInfo", size);
 
-            if (size >= 2) {
-                console.log(`Room full, size is ${size}`);
-
-                removeRoom(data);
-
-                io.to(data).emit("roomFull", size);
+            if (size >= 2) {              
+                startGame(data);
+                io.to(data).emit("startGame");
             }
+
+            setTimeout(() => {
+                delete roomLocks[data];
+            }, 1000);
+          
+        }
+        else if (roomLocks[data]){
+            console.log("Lock taken")
+        }
+        else if (started){
+            console.log("game started")
         }
         else {
             console.log("No room exists")
@@ -96,7 +120,36 @@ io.on("connection", (socket) => {
 
 
     socket.on("signalReady", (data) => {
-        io.to(data.room).emit("playerReady", {playersReady: data.playersReady});
+
+        async function signal() {
+            async function acquireLock() {
+                while (roomLocks[data]) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                roomLocks[data] = true;
+            }
+
+            await acquireLock();
+            console.log(`User ${socket.id} acquired lock`);
+
+            roomLocks[data] = true;
+
+            activeRooms[data].playersReady = activeRooms[data].playersReady + 1;
+
+            if (activeRooms[data].playersReady === 2) {
+                delete roomLocks[data];
+                io.to(data).emit("playersReady");
+            } else {
+                delete roomLocks[data];
+            }
+        }
+
+                
+        signal().then(() => {
+            console.log('finished signaling');
+            console.log(activeRooms[data].playersReady);
+        });
+
     });
 
 

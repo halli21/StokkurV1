@@ -38,7 +38,12 @@ const JoinRoom = ({socket, joinGame, closeJoinView}) => {
                 {openGames.map((game) => (
                     <View key={game.roomId} style={styles.option}>
                         <TouchableOpacity style={styles.gameButton} onPress={() => joinGame(game.roomId)}>
-                            <Text style={styles.hostText}>{game.host.length > MAX_LENGTH ? `${game.host.slice(0, MAX_LENGTH)}...` : game.host}</Text>
+                            <Text style={styles.hostText}>
+                                {game.host && game.host.length > MAX_LENGTH
+                                    ? `${game.host.slice(0, MAX_LENGTH)}...`
+                                    : game.host
+                                }
+                            </Text>
                         </TouchableOpacity>
                     </View>
                 ))}
