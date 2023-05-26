@@ -4,12 +4,14 @@ import styles from "./styles";
 
 
 
-const InviteInbox = ({socket, inbox, closeInviteInbox}) => {
+const InviteInbox = ({socket, inbox, setInbox, closeInviteInbox}) => {
 
     const MAX_LENGTH = 12;
 
-    const acceptInvite = (invite) => {
-        socket.emit("inviteAccepted", invite);
+    const acceptInvite = (acceptedInv) => {
+        const updatedInbox = inbox.filter((invite) => invite.fromSocketId !== acceptedInv.fromSocketId);
+        setInbox(updatedInbox);
+        socket.emit("inviteAccepted", acceptedInv);
     }
 
     return (

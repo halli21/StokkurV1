@@ -50,8 +50,7 @@ const GameMenu = ({socket, name}) => {
 
 
         socket.on("inviteGame", (data) => {
-            console.log(`inviteGame -- data ${data}`)
-            setInviteInboxOpen(false);
+            closeAll();
             setRoom(data);
             setJoinedRoom(true);
         });
@@ -95,7 +94,6 @@ const GameMenu = ({socket, name}) => {
     };
 
 
-
     const openInviteView = () => {
         setInviteViewOpen(true);
     };
@@ -103,6 +101,7 @@ const GameMenu = ({socket, name}) => {
     const closeInviteView = () => {
         setInviteViewOpen(false);
     };
+
 
     const openInviteInbox = () => {
         setInviteInboxOpen(true);
@@ -113,18 +112,24 @@ const GameMenu = ({socket, name}) => {
     };
 
 
-    
+
+    const closeAll = () => {
+        setJoinViewOpen(false);
+        setInviteViewOpen(false);
+        setInviteInboxOpen(false);
+    }
+
 
 
     return (
         <View style={styles.container}>
 
             {inviteInboxOpen && (
-                <InviteInbox socket={socket} inbox={inbox} closeInviteInbox={closeInviteInbox}></InviteInbox>
+                <InviteInbox socket={socket} inbox={inbox} setInbox={setInbox} closeInviteInbox={closeInviteInbox}></InviteInbox>
             )}
 
             {inviteViewOpen && (
-                <OnlinePlayers socket={socket} inbox={inbox} closeInviteView={closeInviteView}></OnlinePlayers>
+                <OnlinePlayers socket={socket} closeInviteView={closeInviteView}></OnlinePlayers>
             )}
 
             {joinViewOpen && (

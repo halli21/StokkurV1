@@ -14,7 +14,6 @@ const GameSession = ({socket, name, Game, gameCode, closeCreate}) => {
 
     useEffect(() => {
         socket.on("getUserInfo", (data) => {
-            console.log("getUserInfo")
             setUser(`Player ${data}`);
         });
 

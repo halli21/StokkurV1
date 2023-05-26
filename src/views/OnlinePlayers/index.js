@@ -26,7 +26,7 @@ const OnlinePlayers = ({socket, closeInviteView}) => {
 
     useEffect(() => {
         socket.on("playersOnline", (data) => {
-            setPlayersOnline([...data]);
+            setPlayersOnline(data);
         });
     
     }, []);
@@ -52,9 +52,11 @@ const OnlinePlayers = ({socket, closeInviteView}) => {
                 </View>
             )}
 
+
             <ScrollView horizontal={false} style={styles.gameList}>
                 {playersOnline.map((player) => (
                     <View key={player.socketId} style={styles.option}>
+
                         <TouchableOpacity style={styles.gameButton} onPress={() => sendInvite(player)}>
                             <Text style={styles.hostText}>
                                 {player.name && player.name.length > MAX_LENGTH

@@ -24,7 +24,24 @@ const addUser = (socketId) => {
     connectedUsers[socketId] = {
         socketId: socketId,
         name: '',
+        status: 'available',
+        inRoom: ''
     };
+}
+
+const userAvailable = (socketId,) => {
+    connectedUsers[socketId].status = 'available';
+    connectedUsers[socketId].inRoom = '';
+}
+
+const userHosting = (socketId, room) => {
+    connectedUsers[socketId].status = 'hosting';
+    connectedUsers[socketId].inRoom = room;
+}
+
+const userPlaying = (socketId, room) => {
+    connectedUsers[socketId].status = 'playing';
+    connectedUsers[socketId].inRoom = room;
 }
 
 const getConnectedUsers = (mySocketId) => {
@@ -34,15 +51,18 @@ const getConnectedUsers = (mySocketId) => {
 }
 
 
-
-
 const addRoom = (roomId, hostName) => {
     activeRooms[roomId] = {
         host: hostName,
         roomId: roomId,
         gameStarted: false,
-        playersReady: 0
+        playersReady: 0,
+        playerIds: []
     };
+}
+
+const addPlayerToRoom = (roomId, socketId) => {
+    activeRooms[roomId].playerIds.push(socketId);
 }
 
 const removeRoom = (roomId) => {
@@ -79,6 +99,8 @@ io.on("connection", (socket) => {
         socket.join(data.gameCode);
 
         addRoom(data.gameCode, data.host);
+        addPlayerToRoom(data.gameCode, socket.id);
+        userHosting(socket.id, data.gameCode);
         
         const size = io.sockets.adapter.rooms.get(data.gameCode).size;
         io.to(socket.id).emit("getUserInfo", size);
@@ -115,8 +137,16 @@ io.on("connection", (socket) => {
                     const size = io.sockets.adapter.rooms.get(data).size;
                     io.to(socket.id).emit("getUserInfo", size);
 
+                    addPlayerToRoom(data, socket.id);
 
-                    if (size >= 2) {              
+                    if (size >= 2) {      
+
+                        let players = activeRooms[data].playerIds;
+
+                        for (const socketId of players) {
+                            userPlaying(socketId, data);
+                        }
+    
                         startGame(data);
                         io.to(data).emit("startGame");
                     }
@@ -151,11 +181,13 @@ io.on("connection", (socket) => {
 
 
     socket.on("gameNotAvailable", (data) => {
+        userAvailable(socket.id);
         removeRoom(data);
     });
 
 
     socket.on("leaveGame", () => {
+        userAvailable(socket.id);
         io.to(socket.id).emit("leftGame");
     });
 
@@ -219,17 +251,19 @@ io.on("connection", (socket) => {
     
 
     socket.on("inviteAccepted", (data) => {
+        if (connectedUsers[data.fromSocketId].status !== 'available') {
+            console.log(connectedUsers[data.fromSocketId].status)
+            return;
+        }
+
         const gameCode = '1';
 
-        console.log(`Socket Id: ${socket.id}, data: ${data.fromName} : ${data.fromSocketId}`)
-
-        socket.join(gameCode);
         addRoom(gameCode, data.fromName);
 
-
+        socket.join(gameCode);
         io.to(socket.id).emit("inviteGame", gameCode);
 
-        const size = io.sockets.adapter.rooms.get(gameCode).size;
+        let size = io.sockets.adapter.rooms.get(gameCode).size;
         io.to(socket.id).emit("getUserInfo", size);
 
 
@@ -237,10 +271,16 @@ io.on("connection", (socket) => {
 
         otherSocket.join(gameCode);
         io.to(otherSocket.id).emit("inviteGame", gameCode);
+
+        size = io.sockets.adapter.rooms.get(gameCode).size;
         io.to(otherSocket.id).emit("getUserInfo", size);
+
+        userPlaying(socket.id, gameCode);
+        userPlaying(otherSocket.id, gameCode);
 
         startGame(gameCode);
         io.to(gameCode).emit("startGame");
+        
     });
 
     
