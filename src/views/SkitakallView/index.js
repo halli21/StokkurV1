@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Dimensions } from 'react-native';
 import styles from './styles';
 
@@ -18,6 +19,8 @@ const SkitakallView = ({gameSetUp, user, turn, myHand, myVisibleCards, myHiddenC
 
             <View style={{ flex: 1, backgroundColor: 'white'}}>
                 <SkitakallSetUp 
+                    myCards={false}
+
                     visibleCards={opponentVisibleCards} 
                     hiddenCards={opponentHiddenCards} 
                     visibleHandler={() => console.log("Do nothing, not your card")}
@@ -31,15 +34,15 @@ const SkitakallView = ({gameSetUp, user, turn, myHand, myVisibleCards, myHiddenC
                 <OpponentHand 
                     hand={opponentHand}
                 />
-            </View> 
-            
+            </View>
 
+
+    
             <View style={{ flex: 1.4, backgroundColor: 'white', justifyContent: 'center' }}>
                 {gameSetUp && (
                     <Table
                         user={user}
                         turn={turn}
-                        
                         drawCardsPile={drawCardsPile} 
                         playedCardsPile={playedCardsPile} 
                         drawHandler={onDrawnCardPlayed}
@@ -59,7 +62,9 @@ const SkitakallView = ({gameSetUp, user, turn, myHand, myVisibleCards, myHiddenC
             </View>
 
             <View style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center'}}>
-                <SkitakallSetUp 
+                <SkitakallSetUp
+                    myCards={true} 
+
                     visibleCards={myVisibleCards} 
                     hiddenCards={myHiddenCards} 
                     visibleHandler={onTableCardPlayed}

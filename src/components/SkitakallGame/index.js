@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
 import styles from './styles';
+
+import { GIF } from 'react-native-gif';
+
 
 
 const _ = require('lodash');
@@ -20,6 +23,8 @@ const suitValues = {
 
 
 const SkitakallGame = ({socket, name, room, user, numPlayers}) => {
+
+    const [gifVisible, setGifVisible] = useState(false);
 
     const [gameSetUp, setGameSetUp] = useState(false)
     const [readyToStart, setReadyToStart] = useState(false)
@@ -157,6 +162,14 @@ const SkitakallGame = ({socket, name, room, user, numPlayers}) => {
             playedCardsPile: [...updatePlayedCardsPile],
             drawCardsPile: [...updateDrawCardsPile],
         });
+    };
+
+    const playGifOnce = () => {
+        setGifVisible(true);
+    
+        setTimeout(() => {
+            setGifVisible(false);
+        }, 1700); 
     };
 
 
@@ -498,11 +511,13 @@ const SkitakallGame = ({socket, name, room, user, numPlayers}) => {
 
     const onHandCardPlayed = (played_card) => {
         if (user !== turn || gameSetUp === false) {
+            console.log(user, gameSetUp)
             return;
         }
 
         let myHand;
         let setMyHand;
+
        
         if (user === 'Player 1') {
             myHand = player1Hand;
@@ -514,12 +529,15 @@ const SkitakallGame = ({socket, name, room, user, numPlayers}) => {
             setMyHand = setPlayer2Hand;
         }
 
+
+
         const result = onCardPlayedHandler(played_card);
 
 
         if (result === 'fail') {
             return;
         }
+
 
     
         let newHand = removeCardsFromHand(played_card, myHand);
@@ -542,6 +560,8 @@ const SkitakallGame = ({socket, name, room, user, numPlayers}) => {
 
 
         if (result === 'bomb') {
+            playGifOnce();
+
             // No turn switch, played disappears
             if (user === 'Player 1') {
                 update({ updatePlayer1Hand: newHand, updatePlayedCardsPile: []});
@@ -776,6 +796,10 @@ const SkitakallGame = ({socket, name, room, user, numPlayers}) => {
 
     return (
         <View>
+            {gifVisible && (
+                <Image style={styles.bomb} source={require('../../resources/explosion.gif')} resizeMode="contain" paused={!gifVisible} />
+            )}
+
             {gameOver && (
                 <GameOver socket={socket} winner={winner}></GameOver>
             )}
@@ -816,7 +840,10 @@ const SkitakallGame = ({socket, name, room, user, numPlayers}) => {
                     playedCardsPile={playedCardsPile}
 
                     onHandCardPlayed={onHandCardPlayed}
+
                     onCardSelectedHandler={onCardSelectedHandler}
+
+
                     onTableCardPlayed={onTableCardPlayed}
                     onHiddenCardPlayed={onHiddenCardPlayed}
                     onDrawnCardPlayed={onDrawnCardPlayed}

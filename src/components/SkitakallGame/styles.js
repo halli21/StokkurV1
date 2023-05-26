@@ -43,4 +43,12 @@ export default StyleSheet.create({
         fontSize: width * 0.05,
         fontWeight: '400'
     },
+    bomb: {
+        position: 'absolute',
+        alignSelf: 'center',
+        top: height * 0.29,
+        left: width * 0.48,
+        zIndex: 9999,
+        width: width * 0.5,
+    }
 })

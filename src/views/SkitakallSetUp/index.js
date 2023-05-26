@@ -5,7 +5,7 @@ import styles from "./styles";
 import Card from '../../components/Card';
 
 
-const SkitakallSetUp = ({visibleCards, hiddenCards, visibleHandler, hiddenHandler, selectCard}) => {
+const SkitakallSetUp = ({myCards, visibleCards, hiddenCards, visibleHandler, hiddenHandler, selectCard}) => {
 
     return (
         <View style={styles.tableCardsContainer}>
@@ -18,8 +18,8 @@ const SkitakallSetUp = ({visibleCards, hiddenCards, visibleHandler, hiddenHandle
                         suit={card.suit}
                         selected={card.selected}
                         hidden={true}
+                        draggable={myCards}
                         onClick={() => hiddenHandler(card)}
-                        
                     />
                 ))}
             </View>
@@ -33,6 +33,7 @@ const SkitakallSetUp = ({visibleCards, hiddenCards, visibleHandler, hiddenHandle
                             suit={visibleCards[0].suit}
                             selected={visibleCards[0].selected}
                             hidden={false}
+                            draggable={myCards}
                             onClick={() => visibleHandler(visibleCards[0])}
                             onLongPress={() => console.log("Visible")}
                             onLongPressHandler={{selectCard : selectCard, card : visibleCards[0]}}
@@ -48,6 +49,7 @@ const SkitakallSetUp = ({visibleCards, hiddenCards, visibleHandler, hiddenHandle
                             suit={visibleCards[1].suit}
                             selected={visibleCards[1].selected}
                             hidden={false}
+                            draggable={myCards}
                             onClick={() => visibleHandler(visibleCards[1])}
                             onLongPress={() => console.log("Visible")}
                             onLongPressHandler={{selectCard : selectCard, card : visibleCards[1]}}
@@ -63,6 +65,7 @@ const SkitakallSetUp = ({visibleCards, hiddenCards, visibleHandler, hiddenHandle
                             suit={visibleCards[2].suit}
                             selected={visibleCards[2].selected}
                             hidden={false}
+                            draggable={myCards}
                             onClick={() => visibleHandler(visibleCards[2])}
                             onLongPress={() => console.log("Visible")}
                             onLongPressHandler={{selectCard : selectCard, card : visibleCards[2]}}

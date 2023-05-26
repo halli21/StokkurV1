@@ -52,7 +52,6 @@ const OnlinePlayers = ({socket, closeInviteView}) => {
                 </View>
             )}
 
-
             <ScrollView horizontal={false} style={styles.gameList}>
                 {playersOnline.map((player) => (
                     <View key={player.socketId} style={styles.option}>

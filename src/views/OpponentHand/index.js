@@ -18,6 +18,7 @@ const OpponentHand = ({hand}) => {
                         suit={card.suit}
                         selected={card.selected}
                         hidden={true}
+                        draggable={false}
                     />
                 </View>
             ))}

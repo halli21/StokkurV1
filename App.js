@@ -37,7 +37,5 @@ export default function App() {
                 <GameMenuAlt socket={socket} name={name}></GameMenuAlt>
             )} 
         </View>
-
-       
     );
 }

@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { View, TouchableOpacity, Image } from "react-native";
+import React, { useState, useEffect, useRef } from 'react';
+import { View, TouchableOpacity, Image, PanResponder, Animated, Dimensions, findNodeHandle, UIManager } from "react-native";
 
 import styles from "./styles";
+
+const { width, height } = Dimensions.get('window');
 
 const cards_images = {
     'AC': require("../../resources/AC.png"),
@@ -71,17 +73,58 @@ const cards_images = {
 };
 
 
-const Card = ({ id, rank, suit, selected, hidden, onClick, onLongPress, onLongPressHandler}) => {
+const Card = ({ id, rank, suit, selected, hidden, draggable, onClick, onLongPress, onLongPressHandler}) => {
+
+    const cardRef = useRef(null);
 
     const [isSelected, setIsSelected] = useState(selected);
     const [isHidden, setIsHidden] = useState(hidden);
+
+
 
     useEffect(() => {
         setIsSelected(false);
     }, [id]);
 
-    const handleLongPress = () => {
-      
+
+    const pan = useRef(new Animated.ValueXY()).current;
+
+
+    const panResponder = useRef(
+        PanResponder.create({
+            onMoveShouldSetPanResponder: () => draggable,
+            onPanResponderMove: Animated.event([null, {dx: pan.x, dy: pan.y,}], { useNativeDriver: false }),
+            onPanResponderRelease: (_, gesture) => {
+
+                const leftThreshold = width * 0.5;
+                const rightThreshold = width; 
+                const bottomThreshold = height * 0.45;
+                const topThreshold = height * 0.3;
+
+    
+                const handle = findNodeHandle(cardRef.current);
+                UIManager.measure(handle, (x, y, width, height, pageX, pageY) => {
+                    //console.log('Card position:', { x: pageX, y: pageY });
+                    if (
+                        pageX < rightThreshold &&
+                        pageX > leftThreshold &&
+                        pageY < bottomThreshold &&
+                        pageY > topThreshold 
+                    ) {
+                        //console.log('Card landed in the played pile');
+                    }
+                });
+                Animated.spring(pan, {
+                    toValue: { x: 0, y: 0 },
+                    useNativeDriver: false,
+                }).start();
+            },
+        })
+    ).current;
+
+
+
+    const handleLongPress = () => {      
         if (!isHidden) {
             const changed = onLongPressHandler.selectCard(onLongPressHandler.card);
             if (changed) {
@@ -90,6 +133,7 @@ const Card = ({ id, rank, suit, selected, hidden, onClick, onLongPress, onLongPr
             }
         }
     }
+
     
     let imageSource;
     if (isHidden) {
@@ -105,6 +149,7 @@ const Card = ({ id, rank, suit, selected, hidden, onClick, onLongPress, onLongPr
                 <Image source={imageSource} style={ isHidden ? styles.hiddenCard : styles.card } />
             </View>
         </TouchableOpacity>
+
     )
 };
 

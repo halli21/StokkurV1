@@ -22,9 +22,11 @@ const PlayerHand = ({hand, playedHandler, selectCard}) => {
                                 suit={card.suit}
                                 selected={card.selected}
                                 hidden={false}
+                                draggable={true}
                                 onClick={() => playedHandler(card)}
                                 onLongPress={() => console.log("PlayerHand")}
                                 onLongPressHandler={{selectCard : selectCard, card : card}}
+
                             />
                         </View>
                     ))}
@@ -39,9 +41,11 @@ const PlayerHand = ({hand, playedHandler, selectCard}) => {
                                 suit={card.suit}
                                 selected={card.selected}
                                 hidden={false}
+                                draggable={true}
                                 onClick={() => playedHandler(card)}
                                 onLongPress={() => console.log("PlayerHand")}
                                 onLongPressHandler={{selectCard : selectCard, card : card}}
+
                             />
                         </View>
                     ))}
