@@ -128,6 +128,7 @@ const SkitakallGame = ({socket, name, room, user, numPlayers}) => {
 
 
     const update = (params) => {
+
         const {
             updateRoom = room,
             updateGameOver = gameOver,
@@ -142,6 +143,26 @@ const SkitakallGame = ({socket, name, room, user, numPlayers}) => {
             updatePlayedCardsPile = playedCardsPile,
             updateDrawCardsPile = drawCardsPile,
         } = params;
+
+
+        if (playedCardsPile.length === 0){
+            if (updatePlayedCardsPile.length === 0){
+                console.log(`${user} played blew up play pile`)
+            } 
+            else {
+                console.log(`${user} played ${updatePlayedCardsPile[updatePlayedCardsPile.length - 1].id} on empty`)
+            }   
+        
+        }
+        else {
+            if (updatePlayedCardsPile.length === 0){
+                console.log(`${user} played blew up play pile`)
+            } 
+            else {
+                console.log(`${user} played ${updatePlayedCardsPile[updatePlayedCardsPile.length - 1].id} on ${playedCardsPile[playedCardsPile.length - 1].id}`)
+            } 
+        }
+
       
         const results = checkWinner(updatePlayer1Hand, updatePlayer2Hand);
       
@@ -560,8 +581,6 @@ const SkitakallGame = ({socket, name, room, user, numPlayers}) => {
 
 
         if (result === 'bomb') {
-            playGifOnce();
-
             // No turn switch, played disappears
             if (user === 'Player 1') {
                 update({ updatePlayer1Hand: newHand, updatePlayedCardsPile: []});
@@ -796,10 +815,6 @@ const SkitakallGame = ({socket, name, room, user, numPlayers}) => {
 
     return (
         <View>
-            {gifVisible && (
-                <Image style={styles.bomb} source={require('../../resources/explosion.gif')} resizeMode="contain" paused={!gifVisible} />
-            )}
-
             {gameOver && (
                 <GameOver socket={socket} winner={winner}></GameOver>
             )}
